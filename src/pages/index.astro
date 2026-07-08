@@ -1,17 +1,761 @@
----
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>庞宇 | 全链路跨境品牌视觉专家</title>
+    <style>
+        /* === 全局重置与基础样式 === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            background: #f9f9f9; 
+        }
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        img, video { max-width: 100%; display: block; }
 
----
+        /* === 导航栏 === */
+        nav { 
+            position: fixed; top: 0; width: 100%; 
+            background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(10px); z-index: 1000; 
+            padding: 15px 5%; display: flex; 
+            justify-content: space-between; align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); 
+        }
+        .logo { 
+            font-size: 1.5rem; font-weight: 800; letter-spacing: -1px; cursor: pointer; user-select: none;
+        }
+        .logo .brand-orange { color: #ff9900; }
+        .logo .brand-black { color: #000; }
+        .nav-links a { 
+            margin-left: 30px; font-weight: 600; font-size: 0.9rem; 
+            text-transform: uppercase; position: relative; padding: 5px 0; 
+        }
+        .nav-links a::after { 
+            content: ''; position: absolute; bottom: 0; left: 0; width: 100%; 
+            height: 2px; background-color: #ff9900; transform: scaleX(0); 
+            transition: transform 0.3s ease; 
+        }
+        .nav-links a:hover { color: #ff9900; }
+        .nav-links a:hover::after { transform: scaleX(1); }
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+        /* === 通用区块样式 === */
+        section { padding: 100px clamp(24px, 5vw, 64px); }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .section-title { font-size: 2.5rem; margin-bottom: 10px; font-weight: 800; }
+        .section-subtitle { color: #666; margin-bottom: 50px; font-size: 1.1rem; }
+        .highlight { color: #ff9900; }
+
+        /* === 1. 首页 Hero === */
+        #home { 
+            height: 100vh; display: flex; align-items: center; justify-content: center; 
+            text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1920&q=80'); 
+            background-size: cover; background-position: center; color: #fff; padding-top: 80px; 
+        }
+        .hero-tag { 
+            background: #ff9900; color: #000; padding: 5px 15px; 
+            border-radius: 20px; font-size: 0.8rem; font-weight: bold; 
+            display: inline-block; margin-bottom: 20px; 
+        }
+        .hero-title { font-size: 4rem; margin-bottom: 20px; line-height: 1.1; }
+        .hero-stats { display: flex; gap: 50px; justify-content: center; margin-top: 40px; }
+        .stat-item h3 { font-size: 3rem; color: #ff9900; min-width: 80px; display: inline-block; }
+
+        /* === 2. 作品展示 === */
+        .filter-tabs { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .filter-btn { 
+            padding: 10px 24px; border: 2px solid #eee; border-radius: 30px; 
+            background: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem; 
+            transition: all 0.3s ease; 
+        }
+        .filter-btn:hover { background: #fff5e6; border-color: #ff9900; color: #ff9900; transform: translateY(-2px); }
+        .filter-btn.active { background: #ff9900; border-color: #ff9900; color: #000; box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3); }
+        
+        .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .project-card { 
+            background: #fff; border-radius: 12px; overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; position: relative; 
+        }
+        .project-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .project-thumb { height: 200px; background: #eee; overflow: hidden; position: relative; }
+        .project-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .project-card:hover .project-thumb img { transform: scale(1.08); }
+        .project-info { padding: 20px; }
+        .project-info h4 { font-size: 1.1rem; margin-bottom: 8px; }
+        .project-info span { font-size: 0.85rem; color: #888; }
+        .project-card .gallery-hint { font-size: 0.8rem; color: #ff9900; margin-top: 8px; font-weight: 600; }
+        .project-gallery { display: none; padding: 0 20px 20px; }
+        .project-card.expanded .project-gallery { display: block; animation: fadeInUp 0.3s ease-out; }
+        .project-gallery-preview { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+        .project-gallery-preview .main-preview { height: 200px; border-radius: 12px; overflow: hidden; position: relative; background: #f4f4f4; }
+        .project-gallery-preview .main-preview img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.35s ease; }
+        .project-gallery-preview .main-preview:hover img { transform: scale(1.03); }
+        .compact-preview { grid-template-columns: 1fr 1fr; }
+        .project-card.expanded { box-shadow: 0 16px 32px rgba(0,0,0,0.14); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .lightbox-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 20px;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-content {
+            position: relative; max-width: 900px; width: 100%; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .lightbox-content img { width: 100%; max-height: 70vh; object-fit: contain; display: block; background: #000; }
+        .lightbox-close, .lightbox-nav {
+            position: absolute; top: 16px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 1.1rem;
+        }
+        .lightbox-close { right: 16px; }
+        .lightbox-nav.prev { left: 16px; }
+        .lightbox-nav.next { right: 16px; top: 50%; transform: translateY(-50%); }
+        .lightbox-caption { padding: 16px 20px; font-size: 0.95rem; color: #333; }
+
+        /* === 3. AI 赋能提效 === */
+        #ai-power { background: #111; color: #fff; }
+        #ai-power .section-subtitle { color: #aaa; }
+        .ai-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 50px; }
+        .ai-stat-box { 
+            background: #222; padding: 30px; border-radius: 10px; text-align: center; 
+            border: 1px solid #333; transition: all 0.3s ease; 
+        }
+        .ai-stat-box:hover { transform: translateY(-5px); border-color: #ff9900; box-shadow: 0 10px 20px rgba(255, 153, 0, 0.1); }
+        .ai-stat-box h3 { font-size: 2.5rem; color: #ff9900; min-width: 60px; display: inline-block; }
+        .ai-stat-box p { color: #aaa; margin-top: 10px; }
+        .tech-stack { margin-top: 60px; text-align: center; }
+        .tech-stack p { color: #888; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
+        .tech-stack span { 
+            font-size: 1.2rem; font-weight: bold; color: #fff; margin: 0 15px; 
+            display: inline-block; margin-bottom: 10px; padding: 5px 15px; 
+            background: #333; border-radius: 20px; transition: all 0.3s ease; 
+        }
+        .tech-stack span:hover { background: #ff9900; color: #000; transform: translateY(-3px); }
+
+        /* === 4. 设计方法论 === */
+        .methodology-wrapper { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 50px; 
+            align-items: center; background: #fff; padding: 50px; 
+            border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
+        }
+        .method-chart { 
+            background: #f4f4f4; height: 350px; border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 1.2rem; color: #999; border: 2px dashed #ddd; 
+            transition: all 0.3s ease; 
+        }
+        .method-chart:hover { border-color: #ff9900; background: #f9f9f9; transform: scale(1.01); }
+        .method-steps { list-style: none; }
+        .method-steps li { 
+            margin-bottom: 20px; padding-left: 30px; position: relative; 
+            transition: transform 0.3s ease; cursor: default; 
+        }
+        .method-steps li:hover { transform: translateX(5px); }
+        .method-steps li::before { 
+            content: ''; position: absolute; left: 0; top: 5px; width: 15px; 
+            height: 15px; background: #ff9900; border-radius: 50%; 
+            transition: all 0.3s ease; 
+        }
+        .method-steps li:hover::before { background: #ffcc00; transform: scale(1.2); }
+
+        /* === 5. 亚马逊百强 === */
+        #amazon-rank { background: #fff; }
+        .chart-container { 
+            background: #fff; padding: 30px; border-radius: 15px; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 50px; 
+        }
+        .chart-preview {
+            height: 300px; background: linear-gradient(135deg, #fff7ed 0%, #ffe7cc 100%);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            border: 1px dashed #ffbb77; color: #8a4b00; cursor: pointer; position: relative; overflow: hidden;
+            font-weight: 600; text-align: center; padding: 24px;
+        }
+        .chart-preview::before {
+            content: '点击放大 BSR 趋势图'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 153, 0, 0.08); font-size: 1.05rem;
+        }
+        .chart-preview:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
+        .rank-item { 
+            display: flex; justify-content: space-between; padding: 18px 20px; 
+            border-bottom: 1px solid #eee; font-size: 1rem; transition: all 0.3s ease; 
+            border-radius: 8px; cursor: pointer; }
+        .rank-item:hover { background-color: #f9f9f9; transform: translateX(5px); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .rank-item:last-child { border-bottom: none; }
+        .rank-item.expanded { background: #fff7ed; border-color: #ffcc99; }
+        .rank-num { font-weight: 800; color: #e74c3c; }
+        .rank-gallery { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; padding: 0 4px 4px; }
+        .rank-item.expanded .rank-gallery { display: grid; }
+        .rank-gallery img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #f0f0f0; }
+        .rank-gallery .gallery-more { display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #666; font-size: 0.9rem; border-radius: 8px; border: 1px dashed #ddd; }
+
+        /* === 6. 联系 === */
+        #contact { background: #111; color: #fff; text-align: center; }
+        .btn { 
+            display: inline-block; padding: 15px 40px; background: #ff9900; 
+            color: #000; font-weight: bold; border-radius: 50px; margin-top: 30px; 
+            transition: all 0.3s ease; 
+        }
+
+        .btn:hover { background: #fff; transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 255, 255, 0.2); }
+        .btn:active { transform: scale(0.98); }
+
+        /* === 响应式 === */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .hero-stats { flex-direction: column; gap: 20px; }
+            .methodology-wrapper { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+            .massive-grid { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+            .project-thumb { height: 180px; }
+        }
+        @media (max-width: 480px) {
+            .massive-grid { grid-template-columns: 1fr; gap: 15px; }
+            .project-card { margin-bottom: 10px; }
+            .hero-stats .stat-item h3 { font-size: 2.2rem; }
+            .ai-stats { grid-template-columns: 1fr; gap: 20px; }
+        }
+
+        /* === 编辑模式提示 === */
+        #edit-mode-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff9900;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav>
+        <div class="logo" id="logo-trigger"><span class="brand-orange">PANGYU.</span><span class="brand-black">DESIGN</span></div>
+        <div class="nav-links">
+            <a href="#home">首页</a>
+            <a href="#works">作品展示</a>
+            <a href="#amazon-rank">百强战绩</a>
+            <a href="#ai-power">AI赋能</a>
+            <a href="#methodology">方法论</a>
+            <a href="#contact">联系</a>
+        </div>
+    </nav>
+
+    <!-- 1. 首页 Hero -->
+    <section id="home">
+        <div>
+            <span class="hero-tag">全链路跨境品牌视觉专家</span>
+            <h1 class="hero-title">用视觉驱动<br><span class="highlight">30+ 亚马逊百强爆款</span></h1>
+            <p style="font-size: 1.2rem; opacity: 0.9;">从站内转化到站外裂变，从产品主图到 CES 展会落地</p>
+            <div class="hero-stats">
+                <div class="stat-item"><h3 class="count-up" data-target="10">0</h3><p>Amazon Best Sellers</p></div>
+                <div class="stat-item"><h3 class="count-up" data-target="50">0</h3><p>服务跨境品牌</p></div>
+                <div class="stat-item"><h3 class="count-up" data-target="100">0</h3><p>CES 展会全案落地</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 作品展示 -->
+    <section id="works">
+        <div class="container">
+            <h2 class="section-title">电子产品<span class="highlight">作品展示</span></h2>
+            <p class="section-subtitle">涵盖亚马逊主图、旗舰店、视频脚本及社媒素材，专注 3C/智能硬件/小家电</p>
+            <div class="filter-tabs">
+                <button class="filter-btn active" type="button" data-filter="all">全部项目</button>
+                <button class="filter-btn" type="button" data-filter="main">亚马逊主图</button>
+                <button class="filter-btn" type="button" data-filter="aplus">旗舰店</button>
+                <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
+            </div>
+            <div class="massive-grid" id="workGrid">
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/ff9900/fff?text=Smart+Watch+Main" alt="智能手表主图"></div>
+                    <div class="project-info"><h4>智能手表 - 类目 #1</h4><span>亚马逊主图 / 卖点可视化</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Earbuds+Flagship" alt="旗舰店"></div>
+                    <div class="project-info"><h4>降噪耳机 - 旗舰店</h4><span>旗舰店 / 转化率 +25%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="video" data-images='["https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=TikTok+Video" alt="社媒视频"></div>
+                    <div class="project-info"><h4>户外储能 - TikTok 爆款</h4><span>社媒视频 / 播放 50W+</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/4a90e2/fff?text=Robot+Vacuum" alt="扫地机主图"></div>
+                    <div class="project-info"><h4>扫地机器人 - 视觉升级</h4><span>亚马逊主图 / 点击率 +18%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/ff6b6b/fff?text=Hair+Dryer" alt="电吹风主图"></div>
+                    <div class="project-info"><h4>电吹风 - 视觉重做</h4><span>亚马逊主图 / CTR +22%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/2ecc71/fff?text=Air+Purifier" alt="空气净化器主图"></div>
+                    <div class="project-info"><h4>空气净化器 - 视觉升级</h4><span>亚马逊主图 / 转化率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=Portable+Fan" alt="便携风扇主图"></div>
+                    <div class="project-info"><h4>便携风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +19%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/34495e/fff?text=Coffee+Maker" alt="咖啡机主图"></div>
+                    <div class="project-info"><h4>咖啡机 - 主图重做</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/f39c12/fff?text=Massage+Gun" alt="按摩枪主图"></div>
+                    <div class="project-info"><h4>按摩枪 - 主图升级</h4><span>亚马逊主图 / 关注率提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/1abc9c/fff?text=Security+Cam" alt="监控摄像头主图"></div>
+                    <div class="project-info"><h4>智能摄像头 - 主图优化</h4><span>亚马逊主图 / 点击率 +16%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/7f8c8d/fff?text=Desk+Lamp" alt="台灯主图"></div>
+                    <div class="project-info"><h4>台灯 - 视觉重构</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/e67e22/fff?text=Water+Bottle" alt="保温杯主图"></div>
+                    <div class="project-info"><h4>保温杯 - 主图迭代</h4><span>亚马逊主图 / 视觉统一提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/95a5a6/fff?text=Travel+Bag" alt="旅行包主图"></div>
+                    <div class="project-info"><h4>旅行包 - 视觉优化</h4><span>亚马逊主图 / 关注提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/00b894/fff?text=Kitchen+Scale" alt="厨房秤主图"></div>
+                    <div class="project-info"><h4>厨房秤 - 主图焕新</h4><span>亚马逊主图 / 购买转化 +12%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/6c5ce7/fff?text=Bluetooth+Speaker" alt="蓝牙音箱主图"></div>
+                    <div class="project-info"><h4>蓝牙音箱 - 视觉强化</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/0984e3/fff?text=Phone+Stand" alt="手机支架主图"></div>
+                    <div class="project-info"><h4>手机支架 - 主图升级</h4><span>亚马逊主图 / 点击率 +14%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/bc6c25/fff?text=Car+Vacuum" alt="车载吸尘器主图"></div>
+                    <div class="project-info"><h4>车载吸尘器 - 视觉重做</h4><span>亚马逊主图 / 浏览转化提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/d63031/fff?text=Sleep+Mask" alt="睡眠眼罩主图"></div>
+                    <div class="project-info"><h4>睡眠眼罩 - 主图优化</h4><span>亚马逊主图 / 关注率 +11%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/2d3436/fff?text=Mini+Projector" alt="迷你投影仪主图"></div>
+                    <div class="project-info"><h4>迷你投影仪 - 视觉升级</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/8e44ad/fff?text=Smart+Scale" alt="智能体脂秤主图"></div>
+                    <div class="project-info"><h4>智能体脂秤 - 主图重做</h4><span>亚马逊主图 / 购买转化 +16%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/1e3799/fff?text=Desk+Fan" alt="桌面风扇主图"></div>
+                    <div class="project-info"><h4>桌面风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/27ae60/fff?text=Air+Fryer" alt="空气炸锅主图"></div>
+                    <div class="project-info"><h4>空气炸锅 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/ff7675/fff?text=Hair+Curler" alt="卷发器主图"></div>
+                    <div class="project-info"><h4>卷发器 - 视觉重构</h4><span>亚马逊主图 / 点击率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/00cec9/fff?text=USB+Hub" alt="USB扩展坞主图"></div>
+                    <div class="project-info"><h4>USB 扩展坞 - 主图优化</h4><span>亚马逊主图 / 关注率 +10%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/636e72/fff?text=Pet+Camera" alt="宠物摄像头主图"></div>
+                    <div class="project-info"><h4>宠物摄像头 - 视觉升级</h4><span>亚马逊主图 / 购买转化 +14%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/e17055/fff?text=Water+Flosser" alt="冲牙器主图"></div>
+                    <div class="project-info"><h4>冲牙器 - 主图重做</h4><span>亚马逊主图 / 点击率 +17%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/74b9ff/fff?text=LED+Lamp" alt="LED台灯主图"></div>
+                    <div class="project-info"><h4>LED 台灯 - 视觉优化</h4><span>亚马逊主图 / 关注度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/55efc4/fff?text=Smart+Plug" alt="智能插座主图"></div>
+                    <div class="project-info"><h4>智能插座 - 主图升级</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/ff9f1c/fff?text=Electric+Toothbrush" alt="电动牙刷主图"></div>
+                    <div class="project-info"><h4>电动牙刷 - 主图优化</h4><span>亚马逊主图 / 点击率 +12%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/81ecec/fff?text=Robot+Mop" alt="扫地机器人拖地版主图"></div>
+                    <div class="project-info"><h4>扫地机器人拖地版 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/6ab04c/fff?text=Portable+Charger" alt="便携充电器主图"></div>
+                    <div class="project-info"><h4>便携充电器 - 视觉重构</h4><span>亚马逊主图 / 关注率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/fd79a8/fff?text=Beauty+Tool" alt="美容仪主图"></div>
+                    <div class="project-info"><h4>美容仪 - 主图优化</h4><span>亚马逊主图 / 购买转化 +11%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 亚马逊百强战绩 -->
+    <section id="amazon-rank">
+        <div class="container">
+            <h2 class="section-title">亚马逊百强<span class="highlight">战绩墙</span></h2>
+            <p class="section-subtitle">由本人独立完成视觉设计的超<strong style="color: #e74c3c;">10款产品</strong>，成功跻身 Best Sellers 榜单。<span style="color: #ff9900; margin-left: 6px;">（同一时期）</span></p>
+            <div class="chart-container">
+                <div class="chart-preview" id="chartPreview">BSR 排名趋势图 / 数据看板预览</div>
+                <div style="margin-top: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #333; border-left: 4px solid #ff9900; padding-left: 10px;">核心爆款案例</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能扫地机 S31</strong> - Home & Kitchen</div><span class="rank-num">#12</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>降噪耳机 X5</strong> - Electronics</div><span class="rank-num">#8</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>便携储能电源</strong> - Tools & Home</div><span class="rank-num">#25</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>电动滑板车 Pro</strong> - Sports</div><span class="rank-num">#45</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能手环 Pro</strong> - Wearables</div><span class="rank-num">#18</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>便携投影仪</strong> - Home Office</div><span class="rank-num">#22</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能音箱</strong> - Electronics</div><span class="rank-num">#16</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>无线充电器</strong> - Accessories</div><span class="rank-num">#30</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能吸尘器</strong> - Home Appliances</div><span class="rank-num">#14</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能门锁</strong> - Smart Home</div><span class="rank-num">#21</span><div class="rank-gallery"></div></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. AI 赋能提效 -->
+    <section id="ai-power">
+        <div class="container">
+            <h2 class="section-title" style="color:#fff;">AI 赋能与<span class="highlight">设计提效</span></h2>
+            <p class="section-subtitle">全面拥抱生成式 AI 工作流，重塑视觉生产力，实现降本增效与创意爆发</p>
+            <div class="ai-stats">
+                <div class="ai-stat-box"><h3 class="count-up" data-target="500" data-suffix="%">0</h3><p>场景图产出效率提升</p></div>
+                <div class="ai-stat-box"><h3 class="count-up" data-target="10000" data-suffix="+">0</h3><p>单月批量生成营销素材</p></div>
+                <div class="ai-stat-box"><h3 class="count-up" data-target="90" data-suffix="%">0</h3><p>外包 3D 建模与摄影成本节省</p></div>
+            </div>
+            <div class="tech-stack">
+                <p>技术栈</p>
+                <span>Midjourney</span>
+                <span>Stable Diffusion</span>
+                <span>Photoshop AI</span>
+                <span>Figma</span>
+                <span>RunwayML</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 设计方法论 -->
+    <section id="methodology">
+        <div class="container">
+            <h2 class="section-title">我的<span class="highlight">设计方法论</span></h2>
+            <p class="section-subtitle">基于跨境电商实战经验总结的视觉转化体系</p>
+            <div class="methodology-wrapper">
+                <div class="method-chart">
+                    [此处可插入转化漏斗图或方法论模型图]
+                </div>
+                <ul class="method-steps">
+                    <li><strong>市场洞察：</strong>研究竞品与目标受众偏好。</li>
+                    <li><strong>卖点提炼：</strong>聚焦核心痛点，视觉化产品优势。</li>
+                    <li><strong>A/B 测试：</strong>通过数据反馈持续优化视觉方案。</li>
+                    <li><strong>品牌一致性：</strong>确保从主图到旗舰店页面的视觉统一。</li>
+                    <li><strong>本地化适配：</strong>针对不同市场进行视觉微调。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. 联系 -->
+    <section id="contact">
+        <div class="container">
+            <h2 class="section-title" style="color:#fff;">与我<span class="highlight">联系</span></h2>
+            <p class="section-subtitle" style="color:#aaa;">期待与您合作，共同打造下一个跨境爆款品牌。</p>
+            <a href="mailto:hello@pangyu.online" class="btn">发送邮件</a>
+        </div>
+    </section>
+
+    <!-- 编辑模式指示器 -->
+    <div id="edit-mode-indicator">编辑模式已开启</div>
+
+    <div class="lightbox-overlay" id="lightboxOverlay">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose" aria-label="关闭">×</button>
+            <button class="lightbox-nav prev" id="lightboxPrev" aria-label="上一张">‹</button>
+            <img id="lightboxImage" src="" alt="作品大图">
+            <button class="lightbox-nav next" id="lightboxNext" aria-label="下一张">›</button>
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+    </div>
+
+    <script>
+        // === 平滑滚动 ===
+        document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const href = anchor.getAttribute('href');
+                const target = href ? document.querySelector<HTMLElement>(href) : null;
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // === 作品过滤功能 ===
+        function filterWorks(type: string, button: HTMLElement | null) {
+            const cards = document.querySelectorAll<HTMLElement>('.project-card');
+            const buttons = document.querySelectorAll<HTMLElement>('.filter-btn');
+
+            buttons.forEach(btn => btn.classList.remove('active'));
+            if (button) {
+                button.classList.add('active');
+            }
+
+            cards.forEach(card => {
+                if (type === 'all' || card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        document.querySelectorAll<HTMLElement>('.filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                filterWorks(button.dataset.filter || 'all', button);
+            });
+        });
+
+        const chartPreview = document.getElementById('chartPreview');
+        const overlay = document.getElementById('lightboxOverlay');
+        const lightboxImage = document.getElementById('lightboxImage') as HTMLImageElement | null;
+        const lightboxCaption = document.getElementById('lightboxCaption');
+        const lightboxClose = document.getElementById('lightboxClose');
+        const lightboxPrev = document.getElementById('lightboxPrev');
+        const lightboxNext = document.getElementById('lightboxNext');
+        let currentLightboxImages: string[] = [];
+        let currentLightboxIndex = 0;
+
+        function openLightbox(images: string[], index = 0) {
+            if (!overlay || !lightboxImage || !lightboxCaption) return;
+            currentLightboxImages = images;
+            currentLightboxIndex = index;
+            lightboxImage.src = images[index] || '';
+            lightboxCaption.textContent = `作品图 ${index + 1}/${images.length}`;
+            overlay.classList.add('active');
+        }
+
+        function closeLightbox() {
+            if (overlay) overlay.classList.remove('active');
+        }
+
+        function showLightboxImage(index: number) {
+            if (!lightboxImage || !lightboxCaption || !currentLightboxImages.length) return;
+            currentLightboxIndex = (index + currentLightboxImages.length) % currentLightboxImages.length;
+            lightboxImage.src = currentLightboxImages[currentLightboxIndex];
+            lightboxCaption.textContent = `作品图 ${currentLightboxIndex + 1}/${currentLightboxImages.length}`;
+        }
+
+        function getProjectGalleryImages(card: HTMLElement) {
+            const baseImages = [
+                'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80',
+                'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80'
+            ];
+            const customImages = JSON.parse(card.dataset.images || '[]') as string[];
+            const sourceImages = customImages.length ? customImages : baseImages;
+            return Array.from({ length: 25 }, (_, index) => `${sourceImages[index % sourceImages.length]}&sig=${index}`);
+        }
+
+        document.querySelectorAll<HTMLElement>('.project-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const isExpanded = card.classList.contains('expanded');
+                document.querySelectorAll<HTMLElement>('.project-card').forEach(otherCard => {
+                    otherCard.classList.remove('expanded');
+                    const gallery = otherCard.querySelector<HTMLElement>('.project-gallery');
+                    if (gallery) gallery.innerHTML = '';
+                });
+
+                if (!isExpanded) {
+                    card.classList.add('expanded');
+                    const images = getProjectGalleryImages(card);
+                    const gallery = card.querySelector<HTMLElement>('.project-gallery');
+                    if (gallery && images.length) {
+                        const previewImages = images.slice(0, 2);
+                        gallery.innerHTML = `
+                            <div class="project-gallery-preview compact-preview">
+                                <div class="main-preview"><img src="${previewImages[0]}" alt="作品主图"></div>
+                                <div class="main-preview secondary-preview"><img src="${previewImages[1]}" alt="作品辅助图"></div>
+                            </div>
+                        `;
+                        gallery.querySelectorAll<HTMLImageElement>('img').forEach((img, index) => {
+                            img.addEventListener('click', (event) => {
+                                event.stopPropagation();
+                                openLightbox(images, index);
+                            });
+                        });
+                    }
+                }
+            });
+        });
+
+        document.querySelectorAll<HTMLElement>('.rank-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const isExpanded = item.classList.contains('expanded');
+                document.querySelectorAll<HTMLElement>('.rank-item').forEach(otherItem => {
+                    otherItem.classList.remove('expanded');
+                    const gallery = otherItem.querySelector<HTMLElement>('.rank-gallery');
+                    if (gallery) gallery.innerHTML = '';
+                });
+
+                if (!isExpanded) {
+                    item.classList.add('expanded');
+                    const images = JSON.parse(item.dataset.images || '[]') as string[];
+                    const gallery = item.querySelector<HTMLElement>('.rank-gallery');
+                    if (gallery && images.length) {
+                        const displayImages = Array.from({ length: 25 }, (_, index) => `${images[index % images.length]}&sig=${index}`);
+                        gallery.innerHTML = displayImages.slice(0, 10).map((src, index) => {
+                            if (index === 9) {
+                                return `<div class="gallery-more">+${displayImages.length - 9} 张</div>`;
+                            }
+                            return `<img src="${src}" alt="爆款案例图片" data-index="${index}">`;
+                        }).join('');
+                        gallery.querySelectorAll<HTMLImageElement>('img').forEach((img, index) => {
+                            img.addEventListener('click', (event) => {
+                                event.stopPropagation();
+                                openLightbox(displayImages, index);
+                            });
+                        });
+                    }
+                }
+            });
+        });
+
+        if (chartPreview) {
+            chartPreview.addEventListener('click', () => {
+                openLightbox([
+                    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80'
+                ], 0);
+            });
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) closeLightbox();
+            });
+        }
+        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+        if (lightboxPrev) lightboxPrev.addEventListener('click', () => showLightboxImage(currentLightboxIndex - 1));
+        if (lightboxNext) lightboxNext.addEventListener('click', () => showLightboxImage(currentLightboxIndex + 1));
+        document.addEventListener('keydown', (event) => {
+            if (!overlay?.classList.contains('active')) return;
+            if (event.key === 'Escape') closeLightbox();
+            if (event.key === 'ArrowRight') showLightboxImage(currentLightboxIndex + 1);
+            if (event.key === 'ArrowLeft') showLightboxImage(currentLightboxIndex - 1);
+        });
+
+        // === 原生 JS 数字滚动动画 ===
+        function animateCountUp(el: HTMLElement) {
+            const target = parseInt(el.dataset.target || '0');
+            const suffix = el.dataset.suffix || '';
+            const duration = 2000; // 2秒动画
+            const step = target / (duration / 16); // 每帧增加的数值
+            let current = 0;
+
+            const timer = setInterval(() => {
+                current += step;
+                if (current >= target) {
+                    el.innerText = target + suffix;
+                    clearInterval(timer);
+                } else {
+                    el.innerText = Math.ceil(current) + suffix;
+                }
+            }, 16);
+        }
+
+        // === 监听滚动触发数字动画 ===
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target instanceof HTMLElement) {
+                    animateCountUp(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.count-up').forEach(el => observer.observe(el));
+
+        // === 编辑模式开关 ===
+        let clickCount = 0;
+        let clickTimer: ReturnType<typeof setTimeout> | null = null;
+        const logo = document.getElementById('logo-trigger');
+        const indicator = document.getElementById('edit-mode-indicator');
+
+        if (logo) {
+            logo.addEventListener('click', () => {
+                clickCount++;
+                if (clickCount === 1) {
+                    clickTimer = setTimeout(() => {
+                        clickCount = 0;
+                    }, 1000); // 1秒内点击3次
+                } else if (clickCount === 3) {
+                    if (clickTimer) clearTimeout(clickTimer);
+                    clickCount = 0;
+                    
+                    const isEditable = document.body.contentEditable === 'true';
+                    document.body.contentEditable = isEditable ? 'false' : 'true';
+                    
+                    if (indicator) {
+                        indicator.style.display = isEditable ? 'none' : 'block';
+                        setTimeout(() => {
+                            if (!isEditable && indicator) indicator.style.display = 'none';
+                        }, 2000);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
 </html>
