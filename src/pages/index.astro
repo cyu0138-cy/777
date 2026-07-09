@@ -138,6 +138,28 @@
         .lightbox-caption { padding: 16px 20px; font-size: 0.95rem; color: #333; }
 
         /* === 3. AI 赋能提效 === */
+        /* === 移动端调整：卡片更紧凑、字体更小、横向滑动提示 === */
+        @media (max-width: 640px) {
+            .massive-grid-wrap { position: relative; padding-bottom: 36px; }
+            .massive-grid { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; -webkit-overflow-scrolling: touch; position: relative; }
+            .massive-grid::-webkit-scrollbar { height: 8px; }
+            .massive-grid::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 6px; }
+            .massive-grid-wrap::after { content: '← 横向滑动查看更多 →'; position: absolute; right: 10px; bottom: 8px; background: rgba(255,255,255,0.92); color: #666; padding: 4px 8px; font-size: 0.78rem; border-radius: 12px; pointer-events: none; }
+            .project-card { min-width: 260px; flex: 0 0 auto; }
+            .project-thumb, .project-gallery-preview .main-preview { height: 100px; }
+            .project-info { padding: 12px; }
+            .project-info h4 { font-size: 1rem; margin-bottom: 6px; }
+            .project-info span, .project-card .gallery-hint { font-size: 0.78rem; }
+            .project-gallery-preview .main-preview img { height: 100px; }
+            .project-card .gallery-hint { font-size: 0.75rem; }
+            .contact-status { bottom: -18px; }
+            .scroll-btn { display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; z-index: 60; }
+            .scroll-btn.prev { left: 6px; }
+            .scroll-btn.next { right: 6px; }
+            .page-dots { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; display: flex; gap: 6px; z-index: 60; }
+            .page-dots .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; border: none; padding: 0; }
+            .page-dots .dot.active { background: #ff9900; }
+        }
         #ai-power { background: #111; color: #fff; }
         #ai-power .section-subtitle { color: #aaa; }
         .ai-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-bottom: 50px; }
@@ -355,10 +377,13 @@
             <div class="filter-tabs">
                 <button class="filter-btn active" type="button" data-filter="all">全部项目</button>
                 <button class="filter-btn" type="button" data-filter="main">亚马逊主图</button>
-                <button class="filter-btn" type="button" data-filter="aplus">旗舰店</button>
+                <button class="filter-btn" type="button" data-filter="aplus">旗舰店/官网</button>
                 <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
+                <button class="filter-btn" type="button" data-filter="other">其他</button>
             </div>
-            <div class="massive-grid" id="workGrid">
+            <div class="massive-grid-wrap">
+                <button class="scroll-btn prev" aria-label="上一页">‹</button>
+                <div class="massive-grid" id="workGrid">
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/ff9900/fff?text=Smart+Watch+Main" alt="智能手表主图"></div>
                     <div class="project-info"><h4>智能手表 - 类目 #1</h4><span>亚马逊主图 / 卖点可视化</span><div class="gallery-hint">点击下方图查看更多</div></div>
@@ -369,9 +394,107 @@
                     <div class="project-info"><h4>降噪耳机 - 旗舰店</h4><span>旗舰店 / 转化率 +25%</span><div class="gallery-hint">点击下方图查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
+                <!-- 额外的旗舰店/官网内容（新增 10 条） -->
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/222/fff?text=Flagship+1"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/222/fff?text=Flagship+1" alt="旗舰店1"></div>
+                    <div class="project-info"><h4>智能耳机 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/333/fff?text=Flagship+2"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Flagship+2" alt="旗舰店2"></div>
+                    <div class="project-info"><h4>户外音箱 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页重做</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/444/fff?text=Flagship+3"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/444/fff?text=Flagship+3" alt="旗舰店3"></div>
+                    <div class="project-info"><h4>腕表 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面视觉优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/555/fff?text=Flagship+4"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/555/fff?text=Flagship+4" alt="旗舰店4"></div>
+                    <div class="project-info"><h4>家用咖啡机 - 旗舰店/官网</h4><span>旗舰店/官网 / 视觉统一</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/666/fff?text=Flagship+5"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/666/fff?text=Flagship+5" alt="旗舰店5"></div>
+                    <div class="project-info"><h4>智能锁 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/777/fff?text=Flagship+6"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/777/fff?text=Flagship+6" alt="旗舰店6"></div>
+                    <div class="project-info"><h4>便携充电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 产品页重构</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/888/fff?text=Flagship+7"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/888/fff?text=Flagship+7" alt="旗舰店7"></div>
+                    <div class="project-info"><h4>摄像头 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/999/fff?text=Flagship+8"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/999/fff?text=Flagship+8" alt="旗舰店8"></div>
+                    <div class="project-info"><h4>扬声器 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/aaa/fff?text=Flagship+9"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/aaa/fff?text=Flagship+9" alt="旗舰店9"></div>
+                    <div class="project-info"><h4>厨房电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面迭代</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/bbb/fff?text=Flagship+10"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/bbb/fff?text=Flagship+10" alt="旗舰店10"></div>
+                    <div class="project-info"><h4>健康家电 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
                 <div class="project-card" data-type="video" data-images='["https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=TikTok+Video" alt="社媒视频"></div>
                     <div class="project-info"><h4>户外储能 - TikTok 爆款</h4><span>社媒视频 / 播放 50W+</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <!-- 额外社媒/视频内容（新增 5 条） -->
+                <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/9b59b6/fff?text=Video+1"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=Video+1" alt="视频1"></div>
+                    <div class="project-info"><h4>产品拆箱 - 短视频系列</h4><span>社媒/视频 / 短视频</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/a569bd/fff?text=Video+2"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/a569bd/fff?text=Video+2" alt="视频2"></div>
+                    <div class="project-info"><h4>使用演示 - 快速教程</h4><span>社媒/视频 / 教程</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/b784c9/fff?text=Video+3"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/b784c9/fff?text=Video+3" alt="视频3"></div>
+                    <div class="project-info"><h4>测评合集 - 深度评测</h4><span>社媒/视频 / 测评</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/c59fd6/fff?text=Video+4"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/c59fd6/fff?text=Video+4" alt="视频4"></div>
+                    <div class="project-info"><h4>创意短片 - 品牌故事</h4><span>社媒/视频 / 品牌短片</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/d3b0e3/fff?text=Video+5"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/d3b0e3/fff?text=Video+5" alt="视频5"></div>
+                    <div class="project-info"><h4>广告短片 - 转化优化</h4><span>社媒/视频 / 广告</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <!-- 新增“其他”栏目内容（4 条） -->
+                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/222/fff?text=Other+1"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/222/fff?text=Other+1" alt="其他1"></div>
+                    <div class="project-info"><h4>周边商品 - 其他</h4><span>其他 / 周边设计</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/333/fff?text=Other+2"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Other+2" alt="其他2"></div>
+                    <div class="project-info"><h4>包装设计 - 其他</h4><span>其他 / 包装</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/444/fff?text=Other+3"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/444/fff?text=Other+3" alt="其他3"></div>
+                    <div class="project-info"><h4>手册设计 - 其他</h4><span>其他 / 说明书</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-gallery"></div>
+                </div>
+                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/555/fff?text=Other+4"]'>
+                    <div class="project-thumb"><img src="https://placehold.co/400x300/555/fff?text=Other+4" alt="其他4"></div>
+                    <div class="project-info"><h4>促销物料 - 其他</h4><span>其他 / 线下物料</span><div class="gallery-hint">左右滑动查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
@@ -519,6 +642,9 @@
                     <div class="project-info"><h4>美容仪 - 主图优化</h4><span>亚马逊主图 / 购买转化 +11%</span><div class="gallery-hint">点击下方图查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
+                </div>
+                <button class="scroll-btn next" aria-label="下一页">›</button>
+                <div class="page-dots" aria-hidden="false"></div>
             </div>
         </div>
     </section>
@@ -795,6 +921,51 @@
             if (event.key === 'ArrowRight') showLightboxImage(currentLightboxIndex + 1);
             if (event.key === 'ArrowLeft') showLightboxImage(currentLightboxIndex - 1);
         });
+
+        // === 移动端横向翻页/分页控制（仅在窄屏可见） ===
+        (function() {
+            const workGrid = document.getElementById('workGrid');
+            if (!workGrid) return;
+            const wrap = workGrid.parentElement;
+            const prevBtn = wrap?.querySelector('.scroll-btn.prev');
+            const nextBtn = wrap?.querySelector('.scroll-btn.next');
+            const dotsWrap = wrap?.querySelector('.page-dots');
+
+            function getPages() {
+                const pageWidth = workGrid.clientWidth || window.innerWidth;
+                return Math.max(1, Math.ceil(workGrid.scrollWidth / pageWidth));
+            }
+
+            function updateDots() {
+                if (!dotsWrap) return;
+                const pages = getPages();
+                const current = Math.round((workGrid.scrollLeft || 0) / (workGrid.clientWidth || window.innerWidth));
+                dotsWrap.innerHTML = '';
+                for (let i = 0; i < pages; i++) {
+                    const btn = document.createElement('button');
+                    btn.className = 'dot' + (i === current ? ' active' : '');
+                    btn.dataset.index = String(i);
+                    dotsWrap.appendChild(btn);
+                }
+            }
+
+            function scrollToPage(index) {
+                const left = (workGrid.clientWidth || window.innerWidth) * index;
+                workGrid.scrollTo({ left, behavior: 'smooth' });
+            }
+
+            prevBtn?.addEventListener('click', () => { scrollToPage(Math.max(0, Math.round(workGrid.scrollLeft / workGrid.clientWidth) - 1)); });
+            nextBtn?.addEventListener('click', () => { scrollToPage(Math.min(getPages() - 1, Math.round(workGrid.scrollLeft / workGrid.clientWidth) + 1)); });
+            dotsWrap?.addEventListener('click', (e) => {
+                const t = e.target;
+                if (t && t.dataset && t.dataset.index) scrollToPage(Number(t.dataset.index));
+            });
+
+            workGrid.addEventListener('scroll', () => { requestAnimationFrame(updateDots); });
+            window.addEventListener('resize', () => { requestAnimationFrame(updateDots); });
+            // 初始化
+            setTimeout(updateDots, 200);
+        })();
 
         // === 原生 JS 数字滚动动画 ===
         function animateCountUp(el: HTMLElement) {
