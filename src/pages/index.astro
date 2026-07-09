@@ -143,8 +143,26 @@
         /* === 移动端调整：卡片更紧凑、字体更小、横向滑动提示 === */
         @media (max-width: 640px) {
             .massive-grid-wrap { position: relative; padding-top: 34px; padding-bottom: 10px; }
-            .filter-tabs { gap: 8px; margin-bottom: 16px; }
-            .filter-btn { padding: 8px 12px; font-size: 0.78rem; border-radius: 999px; }
+            .filter-tabs {
+                gap: 6px;
+                margin-bottom: 10px;
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 2px;
+                scrollbar-width: none;
+            }
+            .filter-tabs::-webkit-scrollbar { display: none; }
+            .filter-btn {
+                padding: 5px 8px;
+                font-size: 0.68rem;
+                border-radius: 999px;
+                line-height: 1.05;
+                min-height: 24px;
+                white-space: nowrap;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
             .massive-grid {
                 display: grid;
                 grid-auto-flow: column;
@@ -166,6 +184,8 @@
                 transform: rotateX(180deg);
             }
             .project-thumb, .project-gallery-preview .main-preview { aspect-ratio: 3 / 2; height: auto; }
+            .project-gallery { padding: 0 8px 8px; }
+            .project-gallery-preview .main-preview { height: 120px; }
             .project-info { padding: 10px; }
             .project-info h4 { font-size: 0.86rem; margin-bottom: 4px; line-height: 1.2; }
             .project-info span, .project-card .gallery-hint { font-size: 0.68rem; }
