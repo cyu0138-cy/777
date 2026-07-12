@@ -10,9 +10,16 @@ type MainProjectCard = {
     sortTime: number;
 };
 
+type WaterfallImage = {
+    src: string;
+    alt: string;
+    folderLabel: string;
+};
+
 const publicRoot = path.resolve(process.cwd(), 'public');
 const mainProjectsRoot = path.join(publicRoot, '2c', '2y');
 const aplusProjectsRoot = path.join(publicRoot, '2c', '3q');
+const waterfallRoot = path.join(publicRoot, '2c', '1p');
 const imageExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
 
 function toPublicUrl(absolutePath: string) {
@@ -65,8 +72,39 @@ async function loadProjectCards(rootPath: string): Promise<MainProjectCard[]> {
         .sort((left, right) => right.sortTime - left.sortTime || left.folderName.localeCompare(right.folderName, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' }));
 }
 
+async function loadWaterfallImages(rootPath: string): Promise<WaterfallImage[]> {
+    const images: WaterfallImage[] = [];
+
+    async function walkDirectory(currentPath: string, folderTrail: string[] = []) {
+        const entries = await fs.readdir(currentPath, { withFileTypes: true });
+
+        for (const entry of entries) {
+            const entryPath = path.join(currentPath, entry.name);
+            if (entry.isDirectory()) {
+                await walkDirectory(entryPath, [...folderTrail, entry.name]);
+                continue;
+            }
+
+            if (!entry.isFile()) continue;
+            if (!imageExtensions.has(path.extname(entry.name).toLowerCase())) continue;
+
+            const folderLabel = folderTrail.length ? folderTrail.join(' / ') : path.basename(rootPath);
+            images.push({
+                src: toPublicUrl(entryPath),
+                alt: `${folderLabel} - ${entry.name}`,
+                folderLabel,
+            });
+        }
+    }
+
+    await walkDirectory(rootPath);
+
+    return images.sort((left, right) => left.alt.localeCompare(right.alt, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' }));
+}
+
 const mainProjectCards = await loadProjectCards(mainProjectsRoot);
 const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
+const waterfallImages = await loadWaterfallImages(waterfallRoot);
 ---
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -206,32 +244,21 @@ const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
             display: block;
             break-inside: avoid;
             margin: 0;
-            border-radius: 0;
+            padding: 0;
+            overflow: hidden;
         }
         .waterfall-block {
             width: 100%;
+            display: block;
             border-radius: 0;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
         }
-        .waterfall-more-wrap {
-            display: flex;
-            justify-content: center;
-            padding: 16px;
-            border-top: 1px solid #f0f0f0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.96), #fff);
+        .waterfall-block img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+            transition: transform 0.35s ease;
         }
-        .waterfall-more-btn {
-            border: none;
-            border-radius: 999px;
-            padding: 10px 24px;
-            background: #111;
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease, opacity 0.2s ease;
-        }
-        .waterfall-more-btn:hover { transform: translateY(-1px); }
-        .waterfall-more-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+        .waterfall-block:hover img { transform: scale(1.02); }
         
         .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .project-card { 
@@ -672,9 +699,14 @@ const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
                 </div>
             </div>
             <div class="waterfall-panel" id="waterfallPanel">
-                <div class="waterfall-grid" id="waterfallGrid"></div>
-                <div class="waterfall-more-wrap">
-                    <button class="waterfall-more-btn" id="waterfallMoreBtn" type="button">点开显示更多</button>
+                <div class="waterfall-grid" id="waterfallGrid">
+                {waterfallImages.map((image) => (
+                    <figure class="waterfall-item" data-folder={image.folderLabel}>
+                        <div class="waterfall-block">
+                            <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+                        </div>
+                    </figure>
+                ))}
                 </div>
             </div>
             <div class="massive-grid-wrap" id="workGridWrap">
@@ -1038,48 +1070,10 @@ const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
         // === 作品过滤与瀑布图集 ===
         const workGridWrap = document.getElementById('workGridWrap');
         const waterfallPanel = document.getElementById('waterfallPanel');
-        const waterfallGrid = document.getElementById('waterfallGrid');
-        const waterfallMoreBtn = document.getElementById('waterfallMoreBtn');
-        const waterfallPalette = [
-            '#ff9f1c', '#ff6b6b', '#f368e0', '#a55eea', '#54a0ff', '#00d2d3',
-            '#1dd1a1', '#48dbfb', '#feca57', '#ff7f50', '#6c5ce7', '#2d98da',
-            '#20bf6b', '#fd9644', '#eb3b5a', '#778ca3', '#3867d6', '#0fb9b1'
-        ];
-        const waterfallHeights = [120, 150, 180, 210, 240, 270, 300, 330];
-        const waterfallBlocks = Array.from({ length: 90 }, (_, index) => ({
-            color: waterfallPalette[index % waterfallPalette.length],
-            height: waterfallHeights[(index * 5 + 3) % waterfallHeights.length]
-        }));
-        const waterfallBatchSize = 24;
-        let waterfallShownCount = 0;
-
-        function renderWaterfall(append = false) {
-            if (!waterfallGrid) return;
-            if (!append) {
-                waterfallGrid.innerHTML = '';
-                waterfallShownCount = 0;
-            }
-
-            const nextCount = Math.min(waterfallShownCount + waterfallBatchSize, waterfallBlocks.length);
-            for (let i = waterfallShownCount; i < nextCount; i++) {
-                const item = document.createElement('div');
-                item.className = 'waterfall-item';
-                item.innerHTML = `<div class="waterfall-block" style="height:${waterfallBlocks[i].height}px;background:${waterfallBlocks[i].color};"></div>`;
-                waterfallGrid.appendChild(item);
-            }
-            waterfallShownCount = nextCount;
-
-            if (waterfallMoreBtn instanceof HTMLButtonElement) {
-                const hasMore = waterfallShownCount < waterfallBlocks.length;
-                waterfallMoreBtn.disabled = !hasMore;
-                waterfallMoreBtn.textContent = hasMore ? '点开显示更多' : '已展示全部';
-            }
-        }
 
         function setWaterfallMode(isWaterfall: boolean) {
             if (workGridWrap) workGridWrap.style.display = isWaterfall ? 'none' : '';
             if (waterfallPanel) waterfallPanel.classList.toggle('active', isWaterfall);
-            if (isWaterfall && waterfallShownCount === 0) renderWaterfall();
         }
 
         function filterWorks(type: string, button: HTMLElement | null) {
@@ -1118,10 +1112,6 @@ const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
         if (defaultFilterBtn) {
             filterWorks(defaultFilterBtn.dataset.filter || 'all', defaultFilterBtn);
         }
-
-        waterfallMoreBtn?.addEventListener('click', () => {
-            renderWaterfall(true);
-        });
 
         const chartPreview = document.getElementById('chartPreview');
         const overlay = document.getElementById('lightboxOverlay');
