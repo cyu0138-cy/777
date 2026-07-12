@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -74,6 +74,52 @@
         }
         .filter-btn:hover { background: #fff5e6; border-color: #ff9900; color: #ff9900; transform: translateY(-2px); }
         .filter-btn.active { background: #ff9900; border-color: #ff9900; color: #000; box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3); }
+
+        .waterfall-panel {
+            display: none;
+            margin-bottom: 28px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.07);
+        }
+        .waterfall-panel.active { display: block; }
+        .waterfall-grid {
+            column-count: 5;
+            column-gap: 0;
+            background: #fff;
+        }
+        .waterfall-item {
+            width: 100%;
+            display: block;
+            break-inside: avoid;
+            margin: 0;
+            border-radius: 0;
+        }
+        .waterfall-block {
+            width: 100%;
+            border-radius: 0;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.65);
+        }
+        .waterfall-more-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+            border-top: 1px solid #f0f0f0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.96), #fff);
+        }
+        .waterfall-more-btn {
+            border: none;
+            border-radius: 999px;
+            padding: 10px 24px;
+            background: #111;
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+        .waterfall-more-btn:hover { transform: translateY(-1px); }
+        .waterfall-more-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
         
         .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
         .project-card { 
@@ -129,9 +175,9 @@
         .lightbox-content {
             position: relative; max-width: 900px; width: 100%; max-height: 86vh; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column;
         }
-        .lightbox-scroll-area { overflow-y: auto; padding: 16px 16px 8px; background: #fff; }
-        .lightbox-gallery { display: flex; flex-direction: column; gap: 12px; }
-        .lightbox-gallery img { width: 100%; height: auto; object-fit: contain; display: block; background: #f3f3f3; border-radius: 10px; }
+        .lightbox-scroll-area { overflow-y: auto; padding: 0; background: #fff; }
+        .lightbox-gallery { display: flex; flex-direction: column; gap: 0; }
+        .lightbox-gallery img { width: 100%; height: auto; object-fit: contain; display: block; background: #f3f3f3; border-radius: 0; }
         .lightbox-close, .lightbox-nav {
             position: absolute; top: 16px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 1.1rem; z-index: 2;
         }
@@ -196,6 +242,7 @@
             .massive-grid::-webkit-scrollbar { height: 8px; }
             .massive-grid::-webkit-scrollbar-thumb { background: rgba(255,153,0,0.55); border-radius: 8px; }
             .massive-grid-wrap::after { content: '横向查看更多'; position: absolute; left: 50%; top: 6px; transform: translateX(-50%); background: rgba(255,255,255,0.94); color: #666; padding: 4px 8px; font-size: 0.72rem; border-radius: 999px; pointer-events: none; }
+            .waterfall-grid { column-count: 3; }
             .contact-status { bottom: -18px; }
             .scroll-btn { display: flex; align-items: center; justify-content: center; position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; z-index: 60; }
             .scroll-btn.prev { left: 6px; }
@@ -222,21 +269,39 @@
             background: #333; border-radius: 20px; transition: all 0.3s ease; 
         }
         .tech-stack span:hover { background: #ff9900; color: #000; transform: translateY(-3px); }
+        .software-stack {
+            margin-top: 0;
+            background: transparent;
+            border-radius: 0;
+            padding: 22px clamp(24px, 5vw, 64px) 16px;
+            text-align: center;
+        }
+        .software-stack p { color: #6e3b00; margin-bottom: 14px; letter-spacing: 1px; font-size: 0.9rem; font-weight: 700; }
+        .software-stack span {
+            font-size: 1.2rem; font-weight: bold; color: #111; margin: 0 10px;
+            display: inline-block; margin-bottom: 10px; padding: 5px 15px;
+            background: rgba(255,255,255,0.55); border-radius: 20px; transition: all 0.3s ease;
+        }
+        .software-stack span:hover { background: #fff; transform: translateY(-3px); }
+        #software-tools { background: #ff9900; padding: 0; }
 
         /* === 4. 设计方法论 === */
         .methodology-wrapper { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 50px; 
-            align-items: center; background: #fff; padding: 50px; 
+            display: grid; grid-template-columns: 1.6fr 0.72fr; gap: 80px; 
+            align-items: center; background: #fff; padding: 68px; 
             border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); 
         }
+        #methodology .container { max-width: 1760px; }
         .method-chart { 
-            background: #f4f4f4; height: 350px; border-radius: 10px; 
+            background: #111; height: auto; border-radius: 10px; 
             display: flex; align-items: center; justify-content: center; 
             font-size: 1.2rem; color: #999; border: 2px dashed #ddd; 
             transition: all 0.3s ease; 
+            overflow: hidden;
         }
         .method-chart:hover { border-color: #ff9900; background: #f9f9f9; transform: scale(1.01); }
-        .method-steps { list-style: none; }
+        .method-chart img { width: 100%; height: auto; object-fit: contain; display: block; }
+        .method-steps { list-style: none; padding-left: 22px; }
         .method-steps li { 
             margin-bottom: 20px; padding-left: 30px; position: relative; 
             transition: transform 0.3s ease; cursor: default; 
@@ -326,7 +391,9 @@
             .hero-title { font-size: 2.2rem; }
             .hero-stats { flex-direction: column; gap: 20px; }
             .methodology-wrapper { grid-template-columns: 1fr; }
+            .method-steps { padding-left: 0; }
             .massive-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+            .waterfall-grid { column-count: 4; }
             .project-thumb { height: 170px; }
             .hero-tag { padding: 6px 12px; font-size: 0.78rem; }
             .hero-title .highlight { display: inline-block; }
@@ -339,6 +406,7 @@
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 8px;
             }
+            .waterfall-grid { column-count: 2; }
             .project-card { width: 100%; }
             .project-thumb { height: 72px; }
             .project-info { padding: 8px; }
@@ -359,7 +427,7 @@
             .contact-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
             .contact-actions a { margin-right: 0; }
             .lightbox-content { max-height: 95vh; }
-            .lightbox-scroll-area { padding: 10px 10px 8px; }
+            .lightbox-scroll-area { padding: 0; }
             .lightbox-caption { padding: 10px 12px 14px; }
         }
 
@@ -411,9 +479,9 @@
             <h1 class="hero-title"># 用视觉驱动<br><span class="highlight">35+ 亚马逊百强爆款</span></h1>
             <p style="font-size: 1.2rem; opacity: 0.9;">从站内转化到站外裂变，从产品主图到 CES 展会落地</p>
             <div class="hero-stats">
-                <div class="stat-item"><h3 class="count-up" data-target="10">0</h3><p>Amazon Best Sellers</p></div>
-                <div class="stat-item"><h3 class="count-up" data-target="50">0</h3><p>服务跨境品牌</p></div>
-                <div class="stat-item"><h3 class="count-up" data-target="100">0</h3><p>CES 展会全案落地</p></div>
+                <div class="stat-item"><h3 class="count-up" data-target="35" data-suffix="+">0</h3><p>Amazon Best Sellers</p></div>
+                <div class="stat-item"><h3 class="count-up" data-target="110" data-suffix="+">0</h3><p>服务跨境产品项目</p></div>
+                <div class="stat-item"><h3 class="count-up" data-target="4500" data-suffix="+">0</h3><p>精品图片设计（非A+）</p></div>
             </div>
             <div class="amazon-badge" aria-hidden="true" title="亚马逊"> 
                 <img src="/1shouye/1ya.png" alt="" />
@@ -425,15 +493,23 @@
     <section id="works">
         <div class="container">
             <h2 class="section-title">电子产品<span class="highlight">作品展示</span></h2>
-            <p class="section-subtitle">涵盖亚马逊主图、旗舰店、视频脚本及社媒素材，专注 3C/智能硬件/小家电</p>
+            <p class="section-subtitle">涵盖亚马逊主图、旗舰店、独立站及社媒热点，专注 3C/智能硬件/小家电</p>
             <div class="filter-tabs">
-                <button class="filter-btn active" type="button" data-filter="all">全部项目</button>
+                <button class="filter-btn active" type="button" data-filter="waterfall">瀑布图集</button>
+                <button class="filter-btn" type="button" data-filter="all">全部项目</button>
                 <button class="filter-btn" type="button" data-filter="main">亚马逊主图</button>
                 <button class="filter-btn" type="button" data-filter="aplus">旗舰店/官网</button>
                 <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
+                <button class="filter-btn" type="button" data-filter="brand">品牌全案</button>
                 <button class="filter-btn" type="button" data-filter="other">其他</button>
             </div>
-            <div class="massive-grid-wrap">
+            <div class="waterfall-panel" id="waterfallPanel">
+                <div class="waterfall-grid" id="waterfallGrid"></div>
+                <div class="waterfall-more-wrap">
+                    <button class="waterfall-more-btn" id="waterfallMoreBtn" type="button">点开显示更多</button>
+                </div>
+            </div>
+            <div class="massive-grid-wrap" id="workGridWrap">
                 <button class="scroll-btn prev" aria-label="上一页">‹</button>
                 <div class="massive-grid" id="workGrid">
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
@@ -733,18 +809,35 @@
             <h2 class="section-title" style="color:#fff;">AI 赋能与<span class="highlight">设计提效</span></h2>
             <p class="section-subtitle">全面拥抱生成式 AI 工作流，重塑视觉生产力，实现降本增效与创意爆发</p>
             <div class="ai-stats">
-                <div class="ai-stat-box"><h3 class="count-up" data-target="500" data-suffix="%">0</h3><p>场景图产出效率提升</p></div>
-                <div class="ai-stat-box"><h3 class="count-up" data-target="10000" data-suffix="+">0</h3><p>单月批量生成营销素材</p></div>
-                <div class="ai-stat-box"><h3 class="count-up" data-target="90" data-suffix="%">0</h3><p>外包 3D 建模与摄影成本节省</p></div>
+                <div class="ai-stat-box"><h3>Top 1%</h3><p>基于大数据优选的高点击率视觉方案</p></div>
+                <div class="ai-stat-box"><h3>≈ 3-5 人</h3><p>等效替代初级设计师月度工作量</p></div>
+                <div class="ai-stat-box"><h3 class="count-up" data-target="90" data-suffix="%">0</h3><p>削减传统寄样、搭棚、拍摄、3D 建模流程视觉制作预算</p></div>
             </div>
             <div class="tech-stack">
                 <p>技术栈</p>
-                <span>Midjourney</span>
-                <span>Stable Diffusion</span>
                 <span>Photoshop AI</span>
-                <span>Figma</span>
-                <span>RunwayML</span>
+                <span>即梦</span>
+                <span>Seedance</span>
+                <span>GPT</span>
+                <span>Nano Banana Pro</span>
+                <span>千问</span>
+                <span>文心</span>
+                <span>Midjourney</span>
             </div>
+        </div>
+    </section>
+
+    <section id="software-tools">
+        <div class="software-stack">
+            <p>使用软件</p>
+            <span>Cinema 4D</span>
+            <span>Arnold</span>
+            <span>Photoshop</span>
+            <span>illustrator</span>
+            <span>KeyShot</span>
+            <span>PureRef</span>
+            <span>Xmind</span>
+            <span>Topaz Photo AI</span>
         </div>
     </section>
 
@@ -752,17 +845,17 @@
     <section id="methodology">
         <div class="container">
             <h2 class="section-title">我的<span class="highlight">设计方法论</span></h2>
-            <p class="section-subtitle">基于跨境电商实战经验总结的视觉转化体系</p>
+            <p class="section-subtitle">基于<span style="color:#ff9900; font-weight:700;">马斯洛需求层次理论</span>和<span style="color:#ff9900; font-weight:700;">跨境电商实战经验总结</span>的视觉转化体系，用视觉设计去满足用户不同层级的心理需求，从而提升转化率。<span style="color:#e53935; font-weight:700;">（59p PPT分析）</span></p>
             <div class="methodology-wrapper">
                 <div class="method-chart">
-                    [此处可插入转化漏斗图或方法论模型图]
+                    <img src="/1shouye/methodology-reference.png" alt="方法论层级图" loading="lazy" />
                 </div>
                 <ul class="method-steps">
-                    <li><strong>市场洞察：</strong>研究竞品与目标受众偏好。</li>
-                    <li><strong>卖点提炼：</strong>聚焦核心痛点，视觉化产品优势。</li>
-                    <li><strong>A/B 测试：</strong>通过数据反馈持续优化视觉方案。</li>
-                    <li><strong>品牌一致性：</strong>确保从主图到旗舰店页面的视觉统一。</li>
-                    <li><strong>本地化适配：</strong>针对不同市场进行视觉微调。</li>
+                    <li><strong>锚定需求层：</strong>看准客户处于哪一级的心理需求。</li>
+                    <li><strong>痛点可视化：</strong>把抽象的焦虑变成直观的视觉。</li>
+                    <li><strong>场景造共鸣：</strong>用真实生活场景拉近客户距离。</li>
+                    <li><strong>拉升价值感：</strong>用高级质感赋予产品高溢价。</li>
+                    <li><strong>传递生活观：</strong>用美学表达理想的生活方式。</li>
                 </ul>
             </div>
         </div>
@@ -772,11 +865,11 @@
     <section id="contact">
         <div class="container">
             <h2 class="section-title" style="color:#fff;">与我<span class="highlight">联系</span></h2>
-            <p class="section-subtitle" style="color:#aaa;">期待与您合作，共同打造下一个跨境爆款品牌。</p>
+            <p class="section-subtitle" style="color:#aaa;">期待与您合作，共同打造下一个跨境爆款产品。</p>
             <div class="contact-card">
                 <div style="position:relative; display:inline-block;">
                     <div class="contact-avatar" id="contactAvatarWrap" title="点击更换头像">
-                        <img id="contactAvatar" src="https://placehold.co/200x200/ffffff/333?text=Avatar" alt="头像（点击更换）">
+                        <img id="contactAvatar" src="/tex/toux.jpg" alt="头像">
                     </div>
                     <div class="contact-status" aria-hidden="true"><span class="dot"></span><span class="text">可任职</span></div>
                 </div>
@@ -788,7 +881,6 @@
                         <a href="mailto:312675265@qq.com">发送邮件</a>
                         <a href="#" id="copyWeChat">复制 WeChat</a>
                     </div>
-                    <div class="contact-hint">提示：点击头像可替换图片（支持图片 URL，保存在本地浏览器）。</div>
                 </div>
             </div>
         </div>
@@ -822,7 +914,53 @@
             });
         });
 
-        // === 作品过滤功能 ===
+        // === 作品过滤与瀑布图集 ===
+        const workGridWrap = document.getElementById('workGridWrap');
+        const waterfallPanel = document.getElementById('waterfallPanel');
+        const waterfallGrid = document.getElementById('waterfallGrid');
+        const waterfallMoreBtn = document.getElementById('waterfallMoreBtn');
+        const waterfallPalette = [
+            '#ff9f1c', '#ff6b6b', '#f368e0', '#a55eea', '#54a0ff', '#00d2d3',
+            '#1dd1a1', '#48dbfb', '#feca57', '#ff7f50', '#6c5ce7', '#2d98da',
+            '#20bf6b', '#fd9644', '#eb3b5a', '#778ca3', '#3867d6', '#0fb9b1'
+        ];
+        const waterfallHeights = [120, 150, 180, 210, 240, 270, 300, 330];
+        const waterfallBlocks = Array.from({ length: 90 }, (_, index) => ({
+            color: waterfallPalette[index % waterfallPalette.length],
+            height: waterfallHeights[(index * 5 + 3) % waterfallHeights.length]
+        }));
+        const waterfallBatchSize = 24;
+        let waterfallShownCount = 0;
+
+        function renderWaterfall(append = false) {
+            if (!waterfallGrid) return;
+            if (!append) {
+                waterfallGrid.innerHTML = '';
+                waterfallShownCount = 0;
+            }
+
+            const nextCount = Math.min(waterfallShownCount + waterfallBatchSize, waterfallBlocks.length);
+            for (let i = waterfallShownCount; i < nextCount; i++) {
+                const item = document.createElement('div');
+                item.className = 'waterfall-item';
+                item.innerHTML = `<div class="waterfall-block" style="height:${waterfallBlocks[i].height}px;background:${waterfallBlocks[i].color};"></div>`;
+                waterfallGrid.appendChild(item);
+            }
+            waterfallShownCount = nextCount;
+
+            if (waterfallMoreBtn instanceof HTMLButtonElement) {
+                const hasMore = waterfallShownCount < waterfallBlocks.length;
+                waterfallMoreBtn.disabled = !hasMore;
+                waterfallMoreBtn.textContent = hasMore ? '点开显示更多' : '已展示全部';
+            }
+        }
+
+        function setWaterfallMode(isWaterfall: boolean) {
+            if (workGridWrap) workGridWrap.style.display = isWaterfall ? 'none' : '';
+            if (waterfallPanel) waterfallPanel.classList.toggle('active', isWaterfall);
+            if (isWaterfall && waterfallShownCount === 0) renderWaterfall();
+        }
+
         function filterWorks(type: string, button: HTMLElement | null) {
             const cards = document.querySelectorAll<HTMLElement>('.project-card');
             const buttons = document.querySelectorAll<HTMLElement>('.filter-btn');
@@ -831,6 +969,13 @@
             if (button) {
                 button.classList.add('active');
             }
+
+            if (type === 'waterfall') {
+                setWaterfallMode(true);
+                return;
+            }
+
+            setWaterfallMode(false);
 
             cards.forEach(card => {
                 if (type === 'all' || card.dataset.type === type) {
@@ -845,6 +990,15 @@
             button.addEventListener('click', () => {
                 filterWorks(button.dataset.filter || 'all', button);
             });
+        });
+
+        const defaultFilterBtn = document.querySelector<HTMLElement>('.filter-btn.active');
+        if (defaultFilterBtn) {
+            filterWorks(defaultFilterBtn.dataset.filter || 'all', defaultFilterBtn);
+        }
+
+        waterfallMoreBtn?.addEventListener('click', () => {
+            renderWaterfall(true);
         });
 
         const chartPreview = document.getElementById('chartPreview');
