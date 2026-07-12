@@ -122,6 +122,47 @@ const mainProjectCards = await loadMainProjectCards();
 
         /* === 2. 作品展示 === */
         .filter-tabs { display: flex; gap: 15px; margin-bottom: 40px; flex-wrap: wrap; }
+        .filter-tabs-shell { margin-bottom: 40px; }
+        .filter-scroll-tip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            color: #8b8b8b;
+            font-size: 0.76rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            user-select: none;
+        }
+        .filter-scroll-tip span { white-space: nowrap; }
+        .filter-scroll-track {
+            position: relative;
+            flex: 1;
+            height: 6px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255,153,0,0.12), rgba(255,153,0,0.35), rgba(255,153,0,0.12));
+            overflow: hidden;
+        }
+        .filter-scroll-track::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+            animation: scrollTrackShimmer 2.8s ease-in-out infinite;
+        }
+        .filter-scroll-track::after {
+            content: '';
+            position: absolute;
+            left: 18%;
+            top: 50%;
+            width: 34%;
+            height: 4px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #ffd36a, #ff9900);
+            box-shadow: 0 0 16px rgba(255, 153, 0, 0.38);
+            transform: translateY(-50%);
+            animation: scrollThumbMove 2.8s ease-in-out infinite;
+        }
         .filter-btn { 
             padding: 10px 24px; border: 2px solid #eee; border-radius: 30px; 
             background: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem; 
@@ -204,6 +245,18 @@ const mainProjectCards = await loadMainProjectCards();
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes scrollTrackShimmer {
+            0% { opacity: 0.5; transform: translateX(-10%); }
+            50% { opacity: 1; transform: translateX(10%); }
+            100% { opacity: 0.5; transform: translateX(-10%); }
+        }
+
+        @keyframes scrollThumbMove {
+            0% { transform: translateY(-50%) translateX(0); }
+            50% { transform: translateY(-50%) translateX(32%); }
+            100% { transform: translateY(-50%) translateX(0); }
+        }
+
         /* subtle background pan for hero */
         @keyframes bgPan {
             0% { background-position: center top; }
@@ -246,6 +299,10 @@ const mainProjectCards = await loadMainProjectCards();
         /* === 移动端调整：卡片更紧凑、字体更小、横向滑动提示 === */
         @media (max-width: 640px) {
             .massive-grid-wrap { position: relative; padding-top: 34px; padding-bottom: 10px; }
+            .filter-tabs-shell { margin-bottom: 32px; }
+            .filter-scroll-tip { gap: 8px; margin-bottom: 8px; font-size: 0.66rem; }
+            .filter-scroll-track { height: 5px; }
+            .filter-scroll-track::after { width: 42%; left: 12%; }
             .filter-tabs {
                 gap: 6px;
                 margin-bottom: 14px;
@@ -585,13 +642,19 @@ const mainProjectCards = await loadMainProjectCards();
         <div class="container">
             <h2 class="section-title">产品<span class="highlight">作品展示</span></h2>
             <p class="section-subtitle">涵盖亚马逊主图、旗舰店、独立站及社媒热点，专注 3C/智能硬件/小家电</p>
-            <div class="filter-tabs">
-                <button class="filter-btn active" type="button" data-filter="waterfall">瀑布图集</button>
-                <button class="filter-btn" type="button" data-filter="main">亚马逊主图</button>
-                <button class="filter-btn" type="button" data-filter="aplus">旗舰店/官网</button>
-                <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
-                <button class="filter-btn" type="button" data-filter="brand">品牌全案</button>
-                <button class="filter-btn" type="button" data-filter="other">其他</button>
+            <div class="filter-tabs-shell">
+                <div class="filter-scroll-tip" aria-hidden="true">
+                    <span>左右滑动查看更多分类</span>
+                    <div class="filter-scroll-track"></div>
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-btn active" type="button" data-filter="waterfall">瀑布图集</button>
+                    <button class="filter-btn" type="button" data-filter="main">亚马逊主图</button>
+                    <button class="filter-btn" type="button" data-filter="aplus">旗舰店/官网</button>
+                    <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
+                    <button class="filter-btn" type="button" data-filter="brand">品牌全案</button>
+                    <button class="filter-btn" type="button" data-filter="other">其他</button>
+                </div>
             </div>
             <div class="waterfall-panel" id="waterfallPanel">
                 <div class="waterfall-grid" id="waterfallGrid"></div>
