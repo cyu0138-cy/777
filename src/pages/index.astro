@@ -245,10 +245,11 @@ const mainProjectCards = await loadMainProjectCards();
             .massive-grid-wrap { position: relative; padding-top: 34px; padding-bottom: 10px; }
             .filter-tabs {
                 gap: 6px;
-                margin-bottom: 10px;
+                margin-bottom: 14px;
                 overflow-x: auto;
+                overflow-y: visible;
                 flex-wrap: nowrap;
-                padding-bottom: 2px;
+                padding: 8px 0 4px;
                 scrollbar-width: none;
             }
             .filter-tabs::-webkit-scrollbar { display: none; }
@@ -262,7 +263,9 @@ const mainProjectCards = await loadMainProjectCards();
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
+                transform: none;
             }
+            .filter-btn:hover, .filter-btn:active, .filter-btn:focus-visible { transform: none; }
             .massive-grid {
                 display: grid;
                 grid-auto-flow: column;
@@ -281,7 +284,7 @@ const mainProjectCards = await loadMainProjectCards();
                 width: 132px;
                 min-width: 132px;
                 max-width: 132px;
-                height: 300px;
+                height: 240px;
                 border-radius: 10px;
                 transform: rotateX(180deg);
             }
@@ -462,9 +465,9 @@ const mainProjectCards = await loadMainProjectCards();
             }
             .waterfall-grid { column-count: 2; }
             .project-card { width: 100%; }
-            .project-thumb { height: 72px; }
+            .project-thumb { height: 88px; }
             .project-info { padding: 8px; }
-            .project-info h4 { font-size: 0.78rem; }
+            .project-info h4 { font-size: 0.8rem; }
             .project-info span { font-size: 0.64rem; }
             .project-card .gallery-hint { font-size: 0.6rem; }
             #works .section-subtitle { font-size: 0.82rem; line-height: 1.45; }
@@ -603,261 +606,261 @@ const mainProjectCards = await loadMainProjectCards();
                 {mainProjectCards.map((card) => (
                     <div class="project-card" data-type="main" data-source="directory" data-images={JSON.stringify(card.images)}>
                         <div class="project-thumb"><img src={card.coverSrc} alt={`${card.folderName} 封面图`}></div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>亚马逊主图 / {card.imageCount} 张素材</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>亚马逊主图 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
                 <div class="project-card" data-type="aplus" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Earbuds+Flagship" alt="旗舰店"></div>
-                    <div class="project-info"><h4>降噪耳机 - 旗舰店</h4><span>旗舰店 / 转化率 +25%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>降噪耳机 - 旗舰店</h4><span>旗舰店 / 转化率 +25%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <!-- 额外的旗舰店/官网内容（新增 10 条） -->
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/222/fff?text=Flagship+1"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/222/fff?text=Flagship+1" alt="旗舰店1"></div>
-                    <div class="project-info"><h4>智能耳机 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>智能耳机 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/333/fff?text=Flagship+2"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Flagship+2" alt="旗舰店2"></div>
-                    <div class="project-info"><h4>户外音箱 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页重做</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>户外音箱 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页重做</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/444/fff?text=Flagship+3"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/444/fff?text=Flagship+3" alt="旗舰店3"></div>
-                    <div class="project-info"><h4>腕表 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面视觉优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>腕表 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面视觉优化</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/555/fff?text=Flagship+4"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/555/fff?text=Flagship+4" alt="旗舰店4"></div>
-                    <div class="project-info"><h4>家用咖啡机 - 旗舰店/官网</h4><span>旗舰店/官网 / 视觉统一</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>家用咖啡机 - 旗舰店/官网</h4><span>旗舰店/官网 / 视觉统一</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/666/fff?text=Flagship+5"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/666/fff?text=Flagship+5" alt="旗舰店5"></div>
-                    <div class="project-info"><h4>智能锁 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>智能锁 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率优化</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/777/fff?text=Flagship+6"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/777/fff?text=Flagship+6" alt="旗舰店6"></div>
-                    <div class="project-info"><h4>便携充电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 产品页重构</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>便携充电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 产品页重构</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/888/fff?text=Flagship+7"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/888/fff?text=Flagship+7" alt="旗舰店7"></div>
-                    <div class="project-info"><h4>摄像头 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>摄像头 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/999/fff?text=Flagship+8"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/999/fff?text=Flagship+8" alt="旗舰店8"></div>
-                    <div class="project-info"><h4>扬声器 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>扬声器 - 旗舰店/官网</h4><span>旗舰店/官网 / 转化率提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/aaa/fff?text=Flagship+9"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/aaa/fff?text=Flagship+9" alt="旗舰店9"></div>
-                    <div class="project-info"><h4>厨房电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面迭代</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>厨房电器 - 旗舰店/官网</h4><span>旗舰店/官网 / 页面迭代</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="aplus" data-images='["https://placehold.co/400x300/bbb/fff?text=Flagship+10"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/bbb/fff?text=Flagship+10" alt="旗舰店10"></div>
-                    <div class="project-info"><h4>健康家电 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>健康家电 - 旗舰店/官网</h4><span>旗舰店/官网 / 品牌页优化</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="video" data-images='["https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=TikTok+Video" alt="社媒视频"></div>
-                    <div class="project-info"><h4>户外储能 - TikTok 爆款</h4><span>社媒视频 / 播放 50W+</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>户外储能 - TikTok 爆款</h4><span>社媒视频 / 播放 50W+</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <!-- 额外社媒/视频内容（新增 5 条） -->
                 <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/9b59b6/fff?text=Video+1"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=Video+1" alt="视频1"></div>
-                    <div class="project-info"><h4>产品拆箱 - 短视频系列</h4><span>社媒/视频 / 短视频</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>产品拆箱 - 短视频系列</h4><span>社媒/视频 / 短视频</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/a569bd/fff?text=Video+2"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/a569bd/fff?text=Video+2" alt="视频2"></div>
-                    <div class="project-info"><h4>使用演示 - 快速教程</h4><span>社媒/视频 / 教程</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>使用演示 - 快速教程</h4><span>社媒/视频 / 教程</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/b784c9/fff?text=Video+3"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/b784c9/fff?text=Video+3" alt="视频3"></div>
-                    <div class="project-info"><h4>测评合集 - 深度评测</h4><span>社媒/视频 / 测评</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>测评合集 - 深度评测</h4><span>社媒/视频 / 测评</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/c59fd6/fff?text=Video+4"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/c59fd6/fff?text=Video+4" alt="视频4"></div>
-                    <div class="project-info"><h4>创意短片 - 品牌故事</h4><span>社媒/视频 / 品牌短片</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>创意短片 - 品牌故事</h4><span>社媒/视频 / 品牌短片</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="video" data-images='["https://placehold.co/400x300/d3b0e3/fff?text=Video+5"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/d3b0e3/fff?text=Video+5" alt="视频5"></div>
-                    <div class="project-info"><h4>广告短片 - 转化优化</h4><span>社媒/视频 / 广告</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>广告短片 - 转化优化</h4><span>社媒/视频 / 广告</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <!-- 新增“其他”栏目内容（4 条） -->
                 <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/222/fff?text=Other+1"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/222/fff?text=Other+1" alt="其他1"></div>
-                    <div class="project-info"><h4>周边商品 - 其他</h4><span>其他 / 周边设计</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>周边商品 - 其他</h4><span>其他 / 周边设计</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/333/fff?text=Other+2"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Other+2" alt="其他2"></div>
-                    <div class="project-info"><h4>包装设计 - 其他</h4><span>其他 / 包装</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>包装设计 - 其他</h4><span>其他 / 包装</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/444/fff?text=Other+3"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/444/fff?text=Other+3" alt="其他3"></div>
-                    <div class="project-info"><h4>手册设计 - 其他</h4><span>其他 / 说明书</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>手册设计 - 其他</h4><span>其他 / 说明书</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/555/fff?text=Other+4"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/555/fff?text=Other+4" alt="其他4"></div>
-                    <div class="project-info"><h4>促销物料 - 其他</h4><span>其他 / 线下物料</span><div class="gallery-hint">左右滑动查看更多</div></div>
+                    <div class="project-info"><h4>促销物料 - 其他</h4><span>其他 / 线下物料</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/4a90e2/fff?text=Robot+Vacuum" alt="扫地机主图"></div>
-                    <div class="project-info"><h4>扫地机器人 - 视觉升级</h4><span>亚马逊主图 / 点击率 +18%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>扫地机器人 - 视觉升级</h4><span>亚马逊主图 / 点击率 +18%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/ff6b6b/fff?text=Hair+Dryer" alt="电吹风主图"></div>
-                    <div class="project-info"><h4>电吹风 - 视觉重做</h4><span>亚马逊主图 / CTR +22%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>电吹风 - 视觉重做</h4><span>亚马逊主图 / CTR +22%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/2ecc71/fff?text=Air+Purifier" alt="空气净化器主图"></div>
-                    <div class="project-info"><h4>空气净化器 - 视觉升级</h4><span>亚马逊主图 / 转化率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>空气净化器 - 视觉升级</h4><span>亚马逊主图 / 转化率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/9b59b6/fff?text=Portable+Fan" alt="便携风扇主图"></div>
-                    <div class="project-info"><h4>便携风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +19%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>便携风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +19%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/34495e/fff?text=Coffee+Maker" alt="咖啡机主图"></div>
-                    <div class="project-info"><h4>咖啡机 - 主图重做</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>咖啡机 - 主图重做</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/f39c12/fff?text=Massage+Gun" alt="按摩枪主图"></div>
-                    <div class="project-info"><h4>按摩枪 - 主图升级</h4><span>亚马逊主图 / 关注率提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>按摩枪 - 主图升级</h4><span>亚马逊主图 / 关注率提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/1abc9c/fff?text=Security+Cam" alt="监控摄像头主图"></div>
-                    <div class="project-info"><h4>智能摄像头 - 主图优化</h4><span>亚马逊主图 / 点击率 +16%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>智能摄像头 - 主图优化</h4><span>亚马逊主图 / 点击率 +16%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/7f8c8d/fff?text=Desk+Lamp" alt="台灯主图"></div>
-                    <div class="project-info"><h4>台灯 - 视觉重构</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>台灯 - 视觉重构</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/e67e22/fff?text=Water+Bottle" alt="保温杯主图"></div>
-                    <div class="project-info"><h4>保温杯 - 主图迭代</h4><span>亚马逊主图 / 视觉统一提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>保温杯 - 主图迭代</h4><span>亚马逊主图 / 视觉统一提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/95a5a6/fff?text=Travel+Bag" alt="旅行包主图"></div>
-                    <div class="project-info"><h4>旅行包 - 视觉优化</h4><span>亚马逊主图 / 关注提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>旅行包 - 视觉优化</h4><span>亚马逊主图 / 关注提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/00b894/fff?text=Kitchen+Scale" alt="厨房秤主图"></div>
-                    <div class="project-info"><h4>厨房秤 - 主图焕新</h4><span>亚马逊主图 / 购买转化 +12%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>厨房秤 - 主图焕新</h4><span>亚马逊主图 / 购买转化 +12%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/6c5ce7/fff?text=Bluetooth+Speaker" alt="蓝牙音箱主图"></div>
-                    <div class="project-info"><h4>蓝牙音箱 - 视觉强化</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>蓝牙音箱 - 视觉强化</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/0984e3/fff?text=Phone+Stand" alt="手机支架主图"></div>
-                    <div class="project-info"><h4>手机支架 - 主图升级</h4><span>亚马逊主图 / 点击率 +14%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>手机支架 - 主图升级</h4><span>亚马逊主图 / 点击率 +14%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/bc6c25/fff?text=Car+Vacuum" alt="车载吸尘器主图"></div>
-                    <div class="project-info"><h4>车载吸尘器 - 视觉重做</h4><span>亚马逊主图 / 浏览转化提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>车载吸尘器 - 视觉重做</h4><span>亚马逊主图 / 浏览转化提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/d63031/fff?text=Sleep+Mask" alt="睡眠眼罩主图"></div>
-                    <div class="project-info"><h4>睡眠眼罩 - 主图优化</h4><span>亚马逊主图 / 关注率 +11%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>睡眠眼罩 - 主图优化</h4><span>亚马逊主图 / 关注率 +11%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/2d3436/fff?text=Mini+Projector" alt="迷你投影仪主图"></div>
-                    <div class="project-info"><h4>迷你投影仪 - 视觉升级</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>迷你投影仪 - 视觉升级</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/8e44ad/fff?text=Smart+Scale" alt="智能体脂秤主图"></div>
-                    <div class="project-info"><h4>智能体脂秤 - 主图重做</h4><span>亚马逊主图 / 购买转化 +16%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>智能体脂秤 - 主图重做</h4><span>亚马逊主图 / 购买转化 +16%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/1e3799/fff?text=Desk+Fan" alt="桌面风扇主图"></div>
-                    <div class="project-info"><h4>桌面风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>桌面风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +13%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/27ae60/fff?text=Air+Fryer" alt="空气炸锅主图"></div>
-                    <div class="project-info"><h4>空气炸锅 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>空气炸锅 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/ff7675/fff?text=Hair+Curler" alt="卷发器主图"></div>
-                    <div class="project-info"><h4>卷发器 - 视觉重构</h4><span>亚马逊主图 / 点击率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>卷发器 - 视觉重构</h4><span>亚马逊主图 / 点击率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/00cec9/fff?text=USB+Hub" alt="USB扩展坞主图"></div>
-                    <div class="project-info"><h4>USB 扩展坞 - 主图优化</h4><span>亚马逊主图 / 关注率 +10%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>USB 扩展坞 - 主图优化</h4><span>亚马逊主图 / 关注率 +10%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/636e72/fff?text=Pet+Camera" alt="宠物摄像头主图"></div>
-                    <div class="project-info"><h4>宠物摄像头 - 视觉升级</h4><span>亚马逊主图 / 购买转化 +14%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>宠物摄像头 - 视觉升级</h4><span>亚马逊主图 / 购买转化 +14%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/e17055/fff?text=Water+Flosser" alt="冲牙器主图"></div>
-                    <div class="project-info"><h4>冲牙器 - 主图重做</h4><span>亚马逊主图 / 点击率 +17%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>冲牙器 - 主图重做</h4><span>亚马逊主图 / 点击率 +17%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/74b9ff/fff?text=LED+Lamp" alt="LED台灯主图"></div>
-                    <div class="project-info"><h4>LED 台灯 - 视觉优化</h4><span>亚马逊主图 / 关注度提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>LED 台灯 - 视觉优化</h4><span>亚马逊主图 / 关注度提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/55efc4/fff?text=Smart+Plug" alt="智能插座主图"></div>
-                    <div class="project-info"><h4>智能插座 - 主图升级</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>智能插座 - 主图升级</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/ff9f1c/fff?text=Electric+Toothbrush" alt="电动牙刷主图"></div>
-                    <div class="project-info"><h4>电动牙刷 - 主图优化</h4><span>亚马逊主图 / 点击率 +12%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>电动牙刷 - 主图优化</h4><span>亚马逊主图 / 点击率 +12%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/81ecec/fff?text=Robot+Mop" alt="扫地机器人拖地版主图"></div>
-                    <div class="project-info"><h4>扫地机器人拖地版 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>扫地机器人拖地版 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/6ab04c/fff?text=Portable+Charger" alt="便携充电器主图"></div>
-                    <div class="project-info"><h4>便携充电器 - 视觉重构</h4><span>亚马逊主图 / 关注率 +15%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>便携充电器 - 视觉重构</h4><span>亚马逊主图 / 关注率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/fd79a8/fff?text=Beauty+Tool" alt="美容仪主图"></div>
-                    <div class="project-info"><h4>美容仪 - 主图优化</h4><span>亚马逊主图 / 购买转化 +11%</span><div class="gallery-hint">点击下方图查看更多</div></div>
+                    <div class="project-info"><h4>美容仪 - 主图优化</h4><span>亚马逊主图 / 购买转化 +11%</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
                 </div>
