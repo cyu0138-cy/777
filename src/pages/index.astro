@@ -703,7 +703,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 --mobile-card-height: calc(var(--mobile-card-width) * 5 / 4);
                 grid-auto-flow: column;
                 grid-template-rows: repeat(4, var(--mobile-card-height));
-                grid-auto-columns: var(--mobile-card-width);
+                grid-auto-columns: minmax(var(--mobile-card-width), var(--mobile-card-width));
                 gap: 10px;
                 overflow-x: auto;
                 overflow-y: hidden;
@@ -712,18 +712,21 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 scrollbar-width: thin;
                 align-items: stretch;
                 align-content: start;
+                justify-content: start;
+                justify-items: stretch;
             }
             .massive-grid.mobile-main-scroll > .project-card {
                 width: var(--mobile-card-width);
                 height: var(--mobile-card-height);
                 min-width: 0;
                 min-height: var(--mobile-card-height);
-                max-width: none;
+                max-width: var(--mobile-card-width);
                 display: flex;
                 flex-direction: column;
                 scroll-snap-align: start;
                 aspect-ratio: auto;
                 overflow: hidden;
+                margin: 0;
             }
             .massive-grid.mobile-main-scroll .project-thumb {
                 height: auto;
