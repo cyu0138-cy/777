@@ -19,6 +19,9 @@ type WaterfallImage = {
 const publicRoot = path.resolve(process.cwd(), 'public');
 const mainProjectsRoot = path.join(publicRoot, '2c', '2y');
 const aplusProjectsRoot = path.join(publicRoot, '2c', '3q');
+const packagingProjectsRoot = path.join(publicRoot, '2c', '6b');
+const cesProjectsRoot = path.join(publicRoot, '2c', '7x');
+const otherProjectsRoot = path.join(publicRoot, '2c', '8q');
 const waterfallRoot = path.join(publicRoot, '2c', '1p');
 const imageExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif']);
 
@@ -41,6 +44,23 @@ async function loadProjectCards(rootPath: string): Promise<MainProjectCard[]> {
             projectFolders.push({
                 folderName: folderEntry.name,
                 folderPath: path.join(monthPath, folderEntry.name),
+            });
+        }
+    }
+
+    // Fallback: some categories use one-level folders directly under root.
+    if (!projectFolders.length) {
+        for (const entry of monthEntries) {
+            if (!entry.isDirectory()) continue;
+            const folderPath = path.join(rootPath, entry.name);
+            const childEntries = await fs.readdir(folderPath, { withFileTypes: true });
+            const hasImageFiles = childEntries.some(
+                (child) => child.isFile() && imageExtensions.has(path.extname(child.name).toLowerCase())
+            );
+            if (!hasImageFiles) continue;
+            projectFolders.push({
+                folderName: entry.name,
+                folderPath,
             });
         }
     }
@@ -104,6 +124,9 @@ async function loadWaterfallImages(rootPath: string): Promise<WaterfallImage[]> 
 
 const mainProjectCards = await loadProjectCards(mainProjectsRoot);
 const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
+const packagingProjectCards = await loadProjectCards(packagingProjectsRoot);
+const cesProjectCards = await loadProjectCards(cesProjectsRoot);
+const otherProjectCards = await loadProjectCards(otherProjectsRoot);
 const waterfallImages = await loadWaterfallImages(waterfallRoot);
 ---
 <!DOCTYPE html>
@@ -695,6 +718,8 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                     <button class="filter-btn" type="button" data-filter="aplus">旗舰店/官网</button>
                     <button class="filter-btn" type="button" data-filter="video">社媒/视频</button>
                     <button class="filter-btn" type="button" data-filter="brand">品牌全案</button>
+                    <button class="filter-btn" type="button" data-filter="packaging">包装/配色</button>
+                    <button class="filter-btn" type="button" data-filter="ces">CES/线下</button>
                     <button class="filter-btn" type="button" data-filter="other">其他</button>
                 </div>
             </div>
@@ -757,27 +782,27 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                     <div class="project-info"><h4>广告短片 - 转化优化</h4><span>社媒/视频 / 广告</span><div class="gallery-hint">点击查看更多</div></div>
                     <div class="project-gallery"></div>
                 </div>
-                <!-- 新增“其他”栏目内容（4 条） -->
-                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/222/fff?text=Other+1"]'>
-                    <div class="project-thumb"><img src="https://placehold.co/400x300/222/fff?text=Other+1" alt="其他1"></div>
-                    <div class="project-info"><h4>周边商品 - 其他</h4><span>其他 / 周边设计</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/333/fff?text=Other+2"]'>
-                    <div class="project-thumb"><img src="https://placehold.co/400x300/333/fff?text=Other+2" alt="其他2"></div>
-                    <div class="project-info"><h4>包装设计 - 其他</h4><span>其他 / 包装</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/444/fff?text=Other+3"]'>
-                    <div class="project-thumb"><img src="https://placehold.co/400x300/444/fff?text=Other+3" alt="其他3"></div>
-                    <div class="project-info"><h4>手册设计 - 其他</h4><span>其他 / 说明书</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="other" data-images='["https://placehold.co/400x300/555/fff?text=Other+4"]'>
-                    <div class="project-thumb"><img src="https://placehold.co/400x300/555/fff?text=Other+4" alt="其他4"></div>
-                    <div class="project-info"><h4>促销物料 - 其他</h4><span>其他 / 线下物料</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
+                {packagingProjectCards.map((card) => (
+                    <div class="project-card" data-type="packaging" data-source="directory" data-images={JSON.stringify(card.images)}>
+                        <div class="project-thumb"><img src={card.coverSrc} alt={`${card.folderName} 封面图`}></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>包装/配色 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-gallery"></div>
+                    </div>
+                ))}
+                {cesProjectCards.map((card) => (
+                    <div class="project-card" data-type="ces" data-source="directory" data-images={JSON.stringify(card.images)}>
+                        <div class="project-thumb"><img src={card.coverSrc} alt={`${card.folderName} 封面图`}></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>CES/线下 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-gallery"></div>
+                    </div>
+                ))}
+                {otherProjectCards.map((card) => (
+                    <div class="project-card" data-type="other" data-source="directory" data-images={JSON.stringify(card.images)}>
+                        <div class="project-thumb"><img src={card.coverSrc} alt={`${card.folderName} 封面图`}></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>其他 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-gallery"></div>
+                    </div>
+                ))}
                 <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
                     <div class="project-thumb"><img src="https://placehold.co/400x300/4a90e2/fff?text=Robot+Vacuum" alt="扫地机主图"></div>
                     <div class="project-info"><h4>扫地机器人 - 视觉升级</h4><span>亚马逊主图 / 点击率 +18%</span><div class="gallery-hint">点击查看更多</div></div>
@@ -968,13 +993,15 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             </div>
             <div class="tech-stack">
                 <p>技术栈</p>
+                <span>Lovart</span>
                 <span>Photoshop AI</span>
                 <span>即梦</span>
                 <span>Seedance</span>
                 <span>GPT</span>
                 <span>Nano Banana Pro</span>
                 <span>千问</span>
-                <span>文心</span>
+                <span>Krea AI</span>
+                <span>DeepSeek</span>
                 <span>Midjourney</span>
             </div>
         </div>
