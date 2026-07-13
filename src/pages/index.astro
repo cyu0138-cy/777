@@ -313,7 +313,83 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
         }
         .waterfall-block:hover img { transform: scale(1.02); }
         
+        .massive-grid-wrap { position: relative; }
         .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; }
+        .work-pagination {
+            margin-top: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .work-pagination[hidden] { display: none !important; }
+        .work-pagination .page-nav {
+            border: 1px solid #e4e4e4;
+            background: #fff;
+            color: #222;
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .work-pagination .page-nav:hover:not(:disabled) {
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+        .work-pagination .page-nav:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+        .work-pagination .page-number-list {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .work-pagination .page-number {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            border: 1px solid #e4e4e4;
+            background: #fff;
+            color: #222;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .work-pagination .page-number:hover {
+            border-color: #ff9900;
+            color: #ff9900;
+        }
+        .work-pagination .page-number.active {
+            background: #ff9900;
+            border-color: #ff9900;
+            color: #000;
+            box-shadow: 0 6px 16px rgba(255, 153, 0, 0.25);
+        }
+        .work-pagination .page-visual {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 2px;
+        }
+        .work-pagination .page-visual-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            border: none;
+            background: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .work-pagination .page-visual-dot:hover { background: #ffbd57; }
+        .work-pagination .page-visual-dot.active {
+            width: 24px;
+            background: #ff9900;
+        }
         .project-card { 
             background: #fff; border-radius: 12px; overflow: hidden; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
@@ -429,7 +505,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 transform: none;
             }
             .filter-btn:hover, .filter-btn:active, .filter-btn:focus-visible { transform: none; }
-            .massive-grid {
+            .massive-grid:not(.mobile-main-scroll) {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
@@ -437,7 +513,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 padding: 2px 2px 8px;
                 transform: none;
             }
-            #works .massive-grid > .project-card {
+            #works .massive-grid:not(.mobile-main-scroll) > .project-card {
                 width: 100%;
                 min-width: 0;
                 max-width: none;
@@ -461,12 +537,9 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             .massive-grid-wrap::after { content: none; }
             .waterfall-grid { column-count: 3; }
             .contact-status { bottom: -18px; }
-            .scroll-btn { display: none; align-items: center; justify-content: center; position: absolute; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; background: rgba(0,0,0,0.6); color: #fff; border: none; border-radius: 50%; z-index: 60; }
-            .scroll-btn.prev { left: 6px; }
-            .scroll-btn.next { right: 6px; }
-            .page-dots { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; display: none; gap: 6px; z-index: 60; }
-            .page-dots .dot { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; border: none; padding: 0; }
-            .page-dots .dot.active { background: #ff9900; }
+            .work-pagination { margin-top: 16px; gap: 10px; }
+            .work-pagination .page-number { width: 30px; height: 30px; font-size: 0.78rem; }
+            .work-pagination .page-nav { padding: 6px 10px; font-size: 0.74rem; }
         }
         #ai-power { background: #111; color: #fff; }
         #ai-power .section-subtitle { color: #aaa; }
@@ -610,16 +683,57 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             .hero-stats { flex-direction: column; gap: 20px; }
             .methodology-wrapper { grid-template-columns: 1fr; }
             .method-steps { padding-left: 0; }
-            .massive-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+            .massive-grid:not(.mobile-main-scroll) { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
             .waterfall-grid { column-count: 4; }
             .project-thumb { height: 170px; }
             .hero-tag { padding: 6px 12px; font-size: 0.78rem; }
             .hero-title .highlight { display: inline-block; }
             .hero-stats .stat-item h3 { font-size: 2.4rem; }
+            .massive-grid.mobile-main-scroll {
+                grid-auto-flow: column;
+                grid-template-rows: repeat(4, minmax(0, auto));
+                grid-auto-columns: minmax(140px, 42vw);
+                gap: 10px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                padding: 2px 2px 10px;
+                scroll-snap-type: x proximity;
+                scrollbar-width: thin;
+            }
+            .massive-grid.mobile-main-scroll > .project-card {
+                width: 100%;
+                min-width: 0;
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+                scroll-snap-align: start;
+            }
+            .massive-grid.mobile-main-scroll .project-thumb {
+                height: auto;
+                aspect-ratio: 4 / 5;
+            }
+            .massive-grid.mobile-main-scroll .project-thumb img,
+            .massive-grid.mobile-main-scroll .project-thumb video {
+                height: 100%;
+                object-fit: cover;
+            }
+            .massive-grid.mobile-main-scroll .project-info {
+                padding: 8px;
+            }
+            .massive-grid.mobile-main-scroll .project-info h4 {
+                font-size: 0.82rem;
+                line-height: 1.2;
+                margin-bottom: 4px;
+            }
+            .massive-grid.mobile-main-scroll .project-info span,
+            .massive-grid.mobile-main-scroll .project-card .gallery-hint {
+                font-size: 0.62rem;
+            }
+            .work-pagination { display: none !important; }
         }
 
         @media (max-width: 480px) {
-            .massive-grid {
+            .massive-grid:not(.mobile-main-scroll) {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
@@ -1069,8 +1183,12 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                     <div class="project-gallery"></div>
                 </div>
                 </div>
-                <button class="scroll-btn next" aria-label="下一页">›</button>
-                <div class="page-dots" aria-hidden="false"></div>
+                <div class="work-pagination" id="workPagination" hidden>
+                    <button class="page-nav prev" type="button" aria-label="上一页">上一页</button>
+                    <div class="page-number-list" id="workPageNumbers" aria-label="分页数字"></div>
+                    <div class="page-visual" id="workPageVisual" aria-label="分页可视化导航"></div>
+                    <button class="page-nav next" type="button" aria-label="下一页">下一页</button>
+                </div>
             </div>
         </div>
     </section>
@@ -1216,16 +1334,115 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
 
         // === 作品过滤与瀑布图集 ===
         const workGridWrap = document.getElementById('workGridWrap');
+        const worksSection = document.getElementById('works');
+        const workGrid = document.getElementById('workGrid');
+        const workPagination = document.getElementById('workPagination');
+        const workPageNumbers = document.getElementById('workPageNumbers');
+        const workPageVisual = document.getElementById('workPageVisual');
+        const paginationPrevBtn = workPagination?.querySelector<HTMLButtonElement>('.page-nav.prev');
+        const paginationNextBtn = workPagination?.querySelector<HTMLButtonElement>('.page-nav.next');
         const waterfallPanel = document.getElementById('waterfallPanel');
+        const mainCardsPerPage = 32;
+        let currentFilter = 'waterfall';
+        let currentMainPage = 1;
+        let visibleMainCards: HTMLElement[] = [];
+
+        function isDesktopViewport() {
+            return window.matchMedia('(min-width: 769px)').matches;
+        }
+
+        function isMobileViewport() {
+            return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        function toggleMainMobileScrollLayout() {
+            if (!(workGrid instanceof HTMLElement)) return;
+            const shouldEnable = currentFilter === 'main' && isMobileViewport();
+            workGrid.classList.toggle('mobile-main-scroll', shouldEnable);
+        }
+
+        function updateMainPaginationUI(totalPages: number) {
+            if (!workPagination || !workPageNumbers || !workPageVisual) return;
+
+            workPageNumbers.innerHTML = '';
+            workPageVisual.innerHTML = '';
+
+            for (let page = 1; page <= totalPages; page++) {
+                const numberBtn = document.createElement('button');
+                numberBtn.type = 'button';
+                numberBtn.className = `page-number${page === currentMainPage ? ' active' : ''}`;
+                numberBtn.textContent = String(page);
+                numberBtn.setAttribute('aria-label', `跳转到第 ${page} 页`);
+                numberBtn.addEventListener('click', () => renderMainPage(page, true));
+                workPageNumbers.appendChild(numberBtn);
+
+                const visualBtn = document.createElement('button');
+                visualBtn.type = 'button';
+                visualBtn.className = `page-visual-dot${page === currentMainPage ? ' active' : ''}`;
+                visualBtn.setAttribute('aria-label', `可视化跳转到第 ${page} 页`);
+                visualBtn.addEventListener('click', () => renderMainPage(page, true));
+                workPageVisual.appendChild(visualBtn);
+            }
+
+            if (paginationPrevBtn) {
+                paginationPrevBtn.disabled = currentMainPage <= 1;
+            }
+            if (paginationNextBtn) {
+                paginationNextBtn.disabled = currentMainPage >= totalPages;
+            }
+        }
+
+        function renderMainPage(targetPage: number, scrollToTop = false) {
+            if (!visibleMainCards.length) {
+                if (workPagination) workPagination.hidden = true;
+                return;
+            }
+
+            if (!isDesktopViewport() || currentFilter !== 'main') {
+                visibleMainCards.forEach((card) => {
+                    card.style.display = 'block';
+                });
+                if (workPagination) workPagination.hidden = true;
+                return;
+            }
+
+            const totalPages = Math.max(1, Math.ceil(visibleMainCards.length / mainCardsPerPage));
+            currentMainPage = Math.min(Math.max(targetPage, 1), totalPages);
+            const start = (currentMainPage - 1) * mainCardsPerPage;
+            const end = start + mainCardsPerPage;
+
+            visibleMainCards.forEach((card, index) => {
+                card.style.display = index >= start && index < end ? 'block' : 'none';
+            });
+
+            if (workPagination) {
+                workPagination.hidden = totalPages <= 1;
+            }
+            updateMainPaginationUI(totalPages);
+
+            if (scrollToTop) {
+                worksSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function refreshMainPagination(cards: HTMLElement[]) {
+            visibleMainCards = cards;
+            currentMainPage = 1;
+            renderMainPage(currentMainPage, false);
+        }
 
         function setWaterfallMode(isWaterfall: boolean) {
             if (workGridWrap) workGridWrap.style.display = isWaterfall ? 'none' : '';
             if (waterfallPanel) waterfallPanel.classList.toggle('active', isWaterfall);
+            if (isWaterfall && workPagination) {
+                workPagination.hidden = true;
+            }
         }
 
         function filterWorks(type: string, button: HTMLElement | null) {
             const cards = document.querySelectorAll<HTMLElement>('.project-card');
             const buttons = document.querySelectorAll<HTMLElement>('.filter-btn');
+            currentFilter = type;
 
             buttons.forEach(btn => btn.classList.remove('active'));
             if (button) {
@@ -1247,7 +1464,36 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                     card.style.display = 'none';
                 }
             });
+
+            if (type === 'main') {
+                const mainCards = Array.from(cards).filter((card) => card.dataset.type === 'main' && card.dataset.source === 'directory');
+                refreshMainPagination(mainCards);
+            } else {
+                visibleMainCards = [];
+                if (workPagination) workPagination.hidden = true;
+            }
+
+            toggleMainMobileScrollLayout();
         }
+
+        paginationPrevBtn?.addEventListener('click', () => {
+            renderMainPage(currentMainPage - 1, true);
+        });
+
+        paginationNextBtn?.addEventListener('click', () => {
+            renderMainPage(currentMainPage + 1, true);
+        });
+
+        window.addEventListener('resize', () => {
+            toggleMainMobileScrollLayout();
+
+            if (currentFilter !== 'main') return;
+
+            const cards = Array.from(document.querySelectorAll<HTMLElement>('.project-card')).filter(
+                (card) => card.dataset.type === 'main' && card.dataset.source === 'directory'
+            );
+            refreshMainPagination(cards);
+        });
 
         document.querySelectorAll<HTMLElement>('.filter-btn').forEach(button => {
             button.addEventListener('click', () => {
@@ -1576,52 +1822,6 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             if (event.key === 'ArrowRight') showLightboxImage(currentLightboxIndex + 1);
             if (event.key === 'ArrowLeft') showLightboxImage(currentLightboxIndex - 1);
         });
-
-        // === 移动端横向翻页/分页控制（仅在窄屏可见） ===
-        (function() {
-            const workGridElement = document.getElementById('workGrid');
-            if (!(workGridElement instanceof HTMLElement)) return;
-            const workGrid = workGridElement!;
-            const wrap = workGrid.parentElement;
-            const prevBtn = wrap?.querySelector('.scroll-btn.prev');
-            const nextBtn = wrap?.querySelector('.scroll-btn.next');
-            const dotsWrap = wrap?.querySelector('.page-dots');
-
-            function getPages(): number {
-                const pageWidth = workGrid.clientWidth || window.innerWidth;
-                return Math.max(1, Math.ceil(workGrid.scrollWidth / pageWidth));
-            }
-
-            function updateDots() {
-                if (!dotsWrap) return;
-                const pages = getPages();
-                const current = Math.round((workGrid.scrollLeft || 0) / (workGrid.clientWidth || window.innerWidth));
-                dotsWrap.innerHTML = '';
-                for (let i = 0; i < pages; i++) {
-                    const btn = document.createElement('button');
-                    btn.className = 'dot' + (i === current ? ' active' : '');
-                    btn.dataset.index = String(i);
-                    dotsWrap.appendChild(btn);
-                }
-            }
-
-            function scrollToPage(index: number) {
-                const left = (workGrid.clientWidth || window.innerWidth) * index;
-                workGrid.scrollTo({ left, behavior: 'smooth' });
-            }
-
-            prevBtn?.addEventListener('click', () => { scrollToPage(Math.max(0, Math.round(workGrid.scrollLeft / workGrid.clientWidth) - 1)); });
-            nextBtn?.addEventListener('click', () => { scrollToPage(Math.min(getPages() - 1, Math.round(workGrid.scrollLeft / workGrid.clientWidth) + 1)); });
-            dotsWrap?.addEventListener('click', (e) => {
-                const target = e.target;
-                if (target instanceof HTMLElement && target.dataset.index) scrollToPage(Number(target.dataset.index));
-            });
-
-            workGrid.addEventListener('scroll', () => { requestAnimationFrame(updateDots); });
-            window.addEventListener('resize', () => { requestAnimationFrame(updateDots); });
-            // 初始化
-            setTimeout(updateDots, 200);
-        })();
 
         // === 原生 JS 数字滚动动画 ===
         function animateCountUp(el: HTMLElement) {
