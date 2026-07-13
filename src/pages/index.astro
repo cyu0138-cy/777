@@ -528,6 +528,8 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             #works .project-thumb, #works .project-gallery-preview .main-preview { aspect-ratio: auto; height: auto; }
             #works .project-thumb img { height: 100%; object-fit: cover; }
             #works .project-thumb video { height: 100%; object-fit: cover; }
+            #works .massive-grid.mobile-main-scroll .project-thumb { aspect-ratio: 1 / 1; }
+            #works .massive-grid.mobile-main-scroll > .project-card { aspect-ratio: 1 / 1; }
             .project-gallery { padding: 0 8px 8px; }
             .project-info { padding: 8px; }
             .project-info h4 { font-size: 0.86rem; margin-bottom: 4px; line-height: 1.2; }
@@ -707,10 +709,12 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 display: flex;
                 flex-direction: column;
                 scroll-snap-align: start;
+                aspect-ratio: 1 / 1;
+                overflow: hidden;
             }
             .massive-grid.mobile-main-scroll .project-thumb {
                 height: auto;
-                aspect-ratio: 4 / 5;
+                aspect-ratio: 1 / 1;
             }
             .massive-grid.mobile-main-scroll .project-thumb img,
             .massive-grid.mobile-main-scroll .project-thumb video {
@@ -719,6 +723,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             }
             .massive-grid.mobile-main-scroll .project-info {
                 padding: 8px;
+                min-height: 0;
             }
             .massive-grid.mobile-main-scroll .project-info h4 {
                 font-size: 0.82rem;
