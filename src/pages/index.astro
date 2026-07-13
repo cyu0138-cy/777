@@ -700,8 +700,10 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             .hero-stats .stat-item h3 { font-size: 2.4rem; }
             .massive-grid.mobile-main-scroll {
                 --mobile-card-width: clamp(132px, 42vw, 178px);
-                --mobile-card-height: calc(var(--mobile-card-width) * 5 / 4);
+                --mobile-info-height: 76px;
+                --mobile-card-height: calc((var(--mobile-card-width) / 2) + var(--mobile-info-height));
                 grid-auto-flow: column;
+                grid-template-columns: none;
                 grid-template-rows: repeat(4, var(--mobile-card-height));
                 grid-auto-columns: minmax(var(--mobile-card-width), var(--mobile-card-width));
                 gap: 10px;
@@ -739,27 +741,42 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
                 object-fit: cover;
             }
             .massive-grid.mobile-main-scroll .project-info {
-                padding: 8px;
+                height: var(--mobile-info-height);
+                padding: 7px 8px;
                 min-height: 0;
                 overflow: hidden;
-                flex: 1 1 auto;
+                flex: 0 0 var(--mobile-info-height);
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
             }
             .massive-grid.mobile-main-scroll .project-info h4 {
                 font-size: 0.82rem;
                 line-height: 1.2;
-                margin-bottom: 4px;
+                margin-bottom: 0;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
+                min-height: calc(1.2em * 2);
             }
             .massive-grid.mobile-main-scroll .project-info span,
             .massive-grid.mobile-main-scroll .project-card .gallery-hint {
                 font-size: 0.62rem;
                 display: block;
-                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+            .massive-grid.mobile-main-scroll .project-info span {
+                line-height: 1.25;
+                min-height: 1.25em;
+                white-space: nowrap;
+            }
+            .massive-grid.mobile-main-scroll .project-card .gallery-hint {
+                margin-top: auto;
+                padding-top: 2px;
+                line-height: 1.15;
+                white-space: nowrap;
             }
             .work-pagination { display: none !important; }
         }
@@ -1375,6 +1392,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
         const paginationNextBtn = workPagination?.querySelector<HTMLButtonElement>('.page-nav.next');
         const waterfallPanel = document.getElementById('waterfallPanel');
         const mainCardsPerPage = 32;
+        const mobileUnifiedFilters = new Set(['main', 'aplus', 'video', 'brand', 'packaging', 'ces', 'other']);
         let currentFilter = 'waterfall';
         let currentMainPage = 1;
         let visibleMainCards: HTMLElement[] = [];
@@ -1389,7 +1407,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
 
         function toggleMainMobileScrollLayout() {
             if (!(workGrid instanceof HTMLElement)) return;
-            const shouldEnable = currentFilter === 'main' && isMobileViewport();
+            const shouldEnable = mobileUnifiedFilters.has(currentFilter) && isMobileViewport();
             workGrid.classList.toggle('mobile-main-scroll', shouldEnable);
         }
 
