@@ -529,7 +529,12 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             #works .project-thumb img { height: 100%; object-fit: cover; }
             #works .project-thumb video { height: 100%; object-fit: cover; }
             #works .massive-grid.mobile-main-scroll .project-thumb { aspect-ratio: 2 / 1; }
-            #works .massive-grid.mobile-main-scroll > .project-card { aspect-ratio: 4 / 5; }
+            #works .massive-grid.mobile-main-scroll > .project-card {
+                width: var(--mobile-card-width);
+                height: var(--mobile-card-height);
+                min-height: var(--mobile-card-height);
+                aspect-ratio: auto;
+            }
             #works .massive-grid.mobile-main-scroll .project-thumb { flex: 0 0 auto; }
             #works .massive-grid.mobile-main-scroll .project-info { flex: 1 1 auto; min-height: 0; overflow: hidden; }
             .project-gallery { padding: 0 8px 8px; }
@@ -694,25 +699,30 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
             .hero-title .highlight { display: inline-block; }
             .hero-stats .stat-item h3 { font-size: 2.4rem; }
             .massive-grid.mobile-main-scroll {
+                --mobile-card-width: clamp(132px, 42vw, 178px);
+                --mobile-card-height: calc(var(--mobile-card-width) * 5 / 4);
                 grid-auto-flow: column;
-                grid-template-rows: repeat(4, minmax(0, auto));
-                grid-auto-columns: minmax(140px, 42vw);
+                grid-template-rows: repeat(4, var(--mobile-card-height));
+                grid-auto-columns: var(--mobile-card-width);
                 gap: 10px;
                 overflow-x: auto;
                 overflow-y: hidden;
                 padding: 2px 2px 10px;
                 scroll-snap-type: x proximity;
                 scrollbar-width: thin;
+                align-items: stretch;
+                align-content: start;
             }
             .massive-grid.mobile-main-scroll > .project-card {
-                width: 100%;
+                width: var(--mobile-card-width);
+                height: var(--mobile-card-height);
                 min-width: 0;
+                min-height: var(--mobile-card-height);
                 max-width: none;
                 display: flex;
                 flex-direction: column;
                 scroll-snap-align: start;
-                aspect-ratio: 4 / 5;
-                height: 100%;
+                aspect-ratio: auto;
                 overflow: hidden;
             }
             .massive-grid.mobile-main-scroll .project-thumb {
