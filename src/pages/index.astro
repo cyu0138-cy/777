@@ -544,6 +544,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         }
         .filter-btn:hover { background: linear-gradient(135deg, rgba(255, 180, 80, 0.8) 0%, rgba(255, 80, 20, 0.7) 100%); border-color: rgba(255, 153, 0, 0.7); color: #fff; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255, 153, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
         .filter-btn.active { background: linear-gradient(135deg, rgba(255, 120, 40, 0.95) 0%, rgba(200, 60, 10, 0.85) 100%); border-color: rgba(255, 100, 20, 0.9); color: #fff; box-shadow: 0 6px 20px rgba(255, 80, 20, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+        .filter-btn.glow-active { animation: glowRipple 0.8s ease-out; }
         #works .filter-btn[data-filter="all"] { display: none !important; }
 
         .waterfall-panel {
@@ -713,6 +714,30 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             0% { transform: translateY(0); }
             50% { transform: translateY(-6px); }
             100% { transform: translateY(0); }
+        }
+
+        /* button click glow ripple effect */
+        @keyframes glowRipple {
+            0% {
+                box-shadow: inset 0 0 15px rgba(255, 150, 80, 0.3), inset 0 0 25px rgba(100, 150, 255, 0);
+                opacity: 1;
+            }
+            25% {
+                box-shadow: inset 0 0 30px rgba(255, 150, 80, 0.6), inset 0 0 20px rgba(100, 150, 255, 0.3);
+                opacity: 0.98;
+            }
+            50% {
+                box-shadow: inset 0 0 35px rgba(150, 180, 255, 0.7), inset 0 0 25px rgba(255, 180, 100, 0.4);
+                opacity: 0.95;
+            }
+            75% {
+                box-shadow: inset 0 0 30px rgba(100, 150, 255, 0.6), inset 0 0 20px rgba(255, 150, 80, 0.3);
+                opacity: 0.92;
+            }
+            100% {
+                box-shadow: inset 0 0 5px rgba(255, 150, 80, 0), inset 0 0 10px rgba(100, 150, 255, 0);
+                opacity: 0.8;
+            }
         }
 
         .hero-title { animation: floatUpDown 6s ease-in-out infinite; }
@@ -968,6 +993,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         .btn:hover { background: linear-gradient(135deg, rgba(255, 120, 50, 0.95) 0%, rgba(200, 40, 0, 0.85) 100%); transform: scale(1.05); box-shadow: 0 8px 20px rgba(255, 80, 20, 0.4); }
         .btn:active { transform: scale(0.98); }
+        .btn.glow-active { animation: glowRipple 0.8s ease-out; }
+        .contact-actions a:hover { background: linear-gradient(135deg, rgba(255, 130, 60, 0.9) 0%, rgba(220, 40, 0, 0.8) 100%); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(255, 100, 20, 0.25), inset 0 0 15px rgba(255, 180, 100, 0.3); }
+        .contact-actions a.glow-active { animation: glowRipple 0.8s ease-out; }
 
         /* === 响应式（移动端优化） === */
         /* Mobile nav and touch improvements */
@@ -1257,14 +1285,14 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                                 <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />
                             )}
                         </div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>亚马逊主图 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>亚马逊主图 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
                 {aplusProjectCards.map((card) => (
                     <div class="project-card" data-type="aplus" data-source="directory" data-images={JSON.stringify(card.images)} data-videos={JSON.stringify(card.videos)}>
                         <div class="project-thumb"><img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`}></div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>旗舰店/官网 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>旗舰店/官网 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
@@ -1343,7 +1371,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                                 <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />
                             )}
                         </div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>品牌全案 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>品牌全案 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
@@ -1361,14 +1389,14 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                                 <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`}>
                             )}
                         </div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>包装/配色 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>包装/配色 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
                 {cesProjectCards.map((card) => (
                     <div class="project-card" data-type="ces" data-source="directory" data-images={JSON.stringify(card.images)} data-videos={JSON.stringify(card.videos)}>
                         <div class="project-thumb"><img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`}></div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>CES/线下 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>CES/线下 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
@@ -1386,7 +1414,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                                 <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />
                             )}
                         </div>
-                        <div class="project-info"><h4>{card.folderName}</h4><span>其他 / {card.imageCount} 张素材</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>其他 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
                         <div class="project-gallery"></div>
                     </div>
                 ))}
@@ -1958,6 +1986,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         document.querySelectorAll<HTMLElement>('.filter-btn').forEach(button => {
             button.addEventListener('click', () => {
                 filterWorks(button.dataset.filter || 'all', button);
+                // Add glow effect
+                button.classList.add('glow-active');
+                setTimeout(() => button.classList.remove('glow-active'), 800);
             });
         });
 
@@ -2386,6 +2417,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         } catch (e) { }
         copyEmailBtn?.addEventListener('click', (e) => {
             e.preventDefault();
+            // Add glow effect
+            (e.target as HTMLElement).classList.add('glow-active');
+            setTimeout(() => (e.target as HTMLElement).classList.remove('glow-active'), 800);
+            
             const text = '312675265@qq.com';
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => alert('Email 已复制：' + text));
@@ -2402,6 +2437,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         copyWeChatBtn?.addEventListener('click', (e) => {
             e.preventDefault();
+            // Add glow effect
+            (e.target as HTMLElement).classList.add('glow-active');
+            setTimeout(() => (e.target as HTMLElement).classList.remove('glow-active'), 800);
+            
             const text = 'YIYUANYUYU';
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => alert('WeChat 已复制：' + text));
@@ -2409,6 +2448,28 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 alert('请手动复制：' + text);
             }
         });
+
+        // Add glow effect to all .btn buttons
+        document.querySelectorAll<HTMLElement>('.btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                button.classList.add('glow-active');
+                setTimeout(() => button.classList.remove('glow-active'), 800);
+            });
+        });
+
+        // Add glow effect to other buttons on interaction
+        document.addEventListener('click', (e) => {
+            const target = (e.target as HTMLElement).closest('a, button');
+            if (!target) return;
+            if (target.classList.contains('glow-active')) return;
+            
+            // Only apply to specific button classes
+            if (!target.classList.contains('filter-btn') && 
+                !target.id?.includes('copy') && 
+                !target.classList.contains('btn')) {
+                // Add glow to any other interactive elements if needed
+            }
+        }, true);
     </script>
 </body>
 </html>
