@@ -284,7 +284,10 @@ async function loadProjectCards(rootPath: string): Promise<MainProjectCard[]> {
             const previewVideoFileName = videoFileNames[0];
             const previewVideoSrc = previewVideoFileName ? toPublicUrl(path.join(folderPath, previewVideoFileName)) : undefined;
             const previewVideoMime = previewVideoFileName ? getVideoMimeType(previewVideoFileName) : undefined;
-            const coverSrc = images[0] ?? previewVideoSrc;
+            
+            // Look for a file named "0" (with any image extension) as cover, otherwise use the first image
+            const coverImageFileName = fileNames.find((fileName) => path.parse(fileName).name === '0' && imageExtensions.has(path.extname(fileName).toLowerCase()));
+            const coverSrc = coverImageFileName ? toPublicUrl(path.join(folderPath, coverImageFileName)) : (images[0] ?? previewVideoSrc);
 
             if (!coverSrc) return null;
 
@@ -819,6 +822,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 align-items: center;
                 justify-content: center;
                 transform: none;
+                border: 1px solid rgba(255, 153, 0, 0.5);
             }
             .filter-btn:hover, .filter-btn:active, .filter-btn:focus-visible { transform: none; }
             .massive-grid:not(.mobile-main-scroll) {
@@ -1276,10 +1280,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                         <div class="project-thumb">
                             {card.previewVideoSrc ? (
                                 <>
-                                    <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster={card.images[0] || undefined} aria-label={`${card.folderName} 主图视频预览`}>
+                                    <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster={card.coverSrc || undefined} aria-label={`${card.folderName} 主图视频预览`}>
                                         <source src={card.previewVideoSrc} type={card.previewVideoMime || 'video/mp4'} />
                                     </video>
-                                    {card.images[0] && <img class="video-fallback-image" {...getCatalogImageAttrs(card.images[0], imageSizes.card)} alt={`${card.folderName} 封面图`} />}
+                                    {card.coverSrc && <img class="video-fallback-image" {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />}
                                 </>
                             ) : (
                                 <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />
