@@ -30,6 +30,7 @@ type ResponsiveImageData = {
 const publicRoot = path.resolve(process.cwd(), 'public');
 const mainProjectsRoot = path.join(publicRoot, '2c', '2y');
 const aplusProjectsRoot = path.join(publicRoot, '2c', '3q');
+const socialProjectsRoot = path.join(publicRoot, '2c', '4s');
 const brandProjectsRoot = path.join(publicRoot, '2c', '5p');
 const packagingProjectsRoot = path.join(publicRoot, '2c', '6b');
 const cesProjectsRoot = path.join(publicRoot, '2c', '7x');
@@ -346,6 +347,7 @@ async function loadWaterfallImages(rootPath: string): Promise<WaterfallImage[]> 
 
 const mainProjectCards = await loadProjectCards(mainProjectsRoot);
 const aplusProjectCards = await loadProjectCards(aplusProjectsRoot);
+const socialProjectCards = await loadProjectCards(socialProjectsRoot);
 const brandProjectCards = await loadProjectCards(brandProjectsRoot);
 const packagingProjectCards = await loadProjectCards(packagingProjectsRoot);
 const cesProjectCards = await loadProjectCards(cesProjectsRoot);
@@ -355,6 +357,7 @@ const waterfallImages = await loadWaterfallImages(waterfallRoot);
 const allProjectCards = [
     ...mainProjectCards,
     ...aplusProjectCards,
+    ...socialProjectCards,
     ...brandProjectCards,
     ...packagingProjectCards,
     ...cesProjectCards,
@@ -367,14 +370,6 @@ const responsiveSourceUrls = new Set<string>([
     '/tex/toux.jpg',
     ...waterfallImages.map((image) => image.src),
     ...allProjectCards.flatMap((card) => [card.coverSrc, ...card.images]),
-    'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
-    'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80',
-    'https://placehold.co/400x300/9b59b6/fff?text=Video+1',
-    'https://placehold.co/400x300/a569bd/fff?text=Video+2',
-    'https://placehold.co/400x300/b784c9/fff?text=Video+3',
-    'https://placehold.co/400x300/c59fd6/fff?text=Video+4',
-    'https://placehold.co/400x300/d3b0e3/fff?text=Video+5',
     'https://placehold.co/400x300/4a90e2/fff?text=Robot+Vacuum',
     'https://placehold.co/400x300/ff6b6b/fff?text=Hair+Dryer',
     'https://placehold.co/400x300/2ecc71/fff?text=Air+Purifier',
@@ -1300,67 +1295,24 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                         <div class="project-gallery"></div>
                     </div>
                 ))}
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4","https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"]' data-images='["https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80" aria-label="户外储能 TikTok 社媒视频预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80', imageSizes.card)} alt="社媒视频封面" />
+                {socialProjectCards.map((card) => (
+                    <div class="project-card" data-type="video" data-source="directory" data-images={JSON.stringify(card.images)} data-videos={JSON.stringify(card.videos)}>
+                        <div class="project-thumb">
+                            {card.previewVideoSrc ? (
+                                <>
+                                    <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster={card.coverSrc || undefined} aria-label={`${card.folderName} 社媒视频预览`}>
+                                        <source src={card.previewVideoSrc} type={card.previewVideoMime || 'video/mp4'} />
+                                    </video>
+                                    {card.coverSrc && <img class="video-fallback-image" {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />}
+                                </>
+                            ) : (
+                                <img {...getCatalogImageAttrs(card.coverSrc, imageSizes.card)} alt={`${card.folderName} 封面图`} />
+                            )}
+                        </div>
+                        <div class="project-info"><h4>{card.folderName}</h4><span>社媒/视频 / {card.imageCount} 张详情图</span><div class="gallery-hint">点击查看更多</div></div>
+                        <div class="project-gallery"></div>
                     </div>
-                    <div class="project-info"><h4>户外储能 - TikTok 爆款</h4><span>社媒视频 / 播放 50W+</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <!-- 额外社媒/视频内容（新增 5 条） -->
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4","https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"]' data-images='["https://placehold.co/400x300/9b59b6/fff?text=Video+1"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://placehold.co/400x300/9b59b6/fff?text=Video+1" aria-label="产品拆箱短视频预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://placehold.co/400x300/9b59b6/fff?text=Video+1', imageSizes.card)} alt="视频1" />
-                    </div>
-                    <div class="project-info"><h4>产品拆箱 - 短视频系列</h4><span>社媒/视频 / 短视频</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"]' data-images='["https://placehold.co/400x300/a569bd/fff?text=Video+2"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://placehold.co/400x300/a569bd/fff?text=Video+2" aria-label="使用演示视频预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://placehold.co/400x300/a569bd/fff?text=Video+2', imageSizes.card)} alt="视频2" />
-                    </div>
-                    <div class="project-info"><h4>使用演示 - 快速教程</h4><span>社媒/视频 / 教程</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm","https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"]' data-images='["https://placehold.co/400x300/b784c9/fff?text=Video+3"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://placehold.co/400x300/b784c9/fff?text=Video+3" aria-label="测评合集视频预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://placehold.co/400x300/b784c9/fff?text=Video+3', imageSizes.card)} alt="视频3" />
-                    </div>
-                    <div class="project-info"><h4>测评合集 - 深度评测</h4><span>社媒/视频 / 测评</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"]' data-images='["https://placehold.co/400x300/c59fd6/fff?text=Video+4"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://placehold.co/400x300/c59fd6/fff?text=Video+4" aria-label="品牌故事短片预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://placehold.co/400x300/c59fd6/fff?text=Video+4', imageSizes.card)} alt="视频4" />
-                    </div>
-                    <div class="project-info"><h4>创意短片 - 品牌故事</h4><span>社媒/视频 / 品牌短片</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="video" data-videos='["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"]' data-images='["https://placehold.co/400x300/d3b0e3/fff?text=Video+5"]'>
-                    <div class="project-thumb">
-                        <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="https://placehold.co/400x300/d3b0e3/fff?text=Video+5" aria-label="广告短片预览">
-                            <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-                        </video>
-                        <img class="video-fallback-image" {...getCatalogImageAttrs('https://placehold.co/400x300/d3b0e3/fff?text=Video+5', imageSizes.card)} alt="视频5" />
-                    </div>
-                    <div class="project-info"><h4>广告短片 - 转化优化</h4><span>社媒/视频 / 广告</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
+                ))}
                 {brandProjectCards.map((card) => (
                     <div class="project-card" data-type="brand" data-source="directory" data-images={JSON.stringify(card.images)} data-videos={JSON.stringify(card.videos)}>
                         <div class="project-thumb">
