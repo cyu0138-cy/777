@@ -1268,7 +1268,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 </div>
             </div>
             <div class="massive-grid-wrap" id="workGridWrap">
-                <button class="scroll-btn prev" aria-label="上一页">‹</button>
                 <div class="massive-grid" id="workGrid">
                 {mainProjectCards.map((card) => (
                     <div class="project-card" data-type="main" data-source="directory" data-images={JSON.stringify(card.images)} data-videos={JSON.stringify(card.videos)}>
@@ -2166,9 +2165,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
             const tryPlayPreview = () => {
                 video.play().then(() => {
-                    hideFallback();
                 }).catch(() => {
-                    // Mobile browsers may delay autoplay until the video is visible.
+                    // Keep cover visible if autoplay is blocked or decode failed.
+                    showFallback();
                 });
             };
 
@@ -2182,22 +2181,28 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             video.setAttribute('playsinline', '');
             video.setAttribute('webkit-playsinline', 'true');
 
+            // Start from image fallback and only hide it after video is really playing.
+            showFallback();
+
             if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                hideFallback();
                 tryPlayPreview();
             }
 
-            video.addEventListener('loadeddata', hideFallback);
+            video.addEventListener('loadeddata', tryPlayPreview);
             video.addEventListener('loadedmetadata', tryPlayPreview);
             video.addEventListener('canplay', () => {
-                hideFallback();
                 tryPlayPreview();
             });
             video.addEventListener('playing', hideFallback);
             video.addEventListener('error', showFallback);
+            video.addEventListener('abort', showFallback);
+            video.addEventListener('stalled', showFallback);
+            video.addEventListener('emptied', showFallback);
             video.addEventListener('suspend', () => {
                 if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                    hideFallback();
+                    tryPlayPreview();
+                } else {
+                    showFallback();
                 }
             });
 
