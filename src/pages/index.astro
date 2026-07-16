@@ -41,6 +41,7 @@ const imageExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avi
 const videoExtensions = new Set(['.mp4', '.webm', '.mov']);
 const responsiveVariantWidths = [240, 360, 480, 640, 960, 1280];
 const responsiveImageCache = new Map<string, Promise<ResponsiveImageData>>();
+const isDev = import.meta.env.DEV;
 
 const imageSizes = {
     waterfall: '(max-width: 480px) 50vw, (max-width: 768px) 33vw, (max-width: 1200px) 20vw, 280px',
@@ -203,6 +204,9 @@ async function getResponsiveImageData(src: string): Promise<ResponsiveImageData>
     if (!src) return { src };
 
     if (isLocalPublicImageUrl(src)) {
+        if (isDev) {
+            return { src: normalizePublicUrl(src) };
+        }
         const ext = getPublicUrlExtension(src);
         if (!imageExtensions.has(ext)) {
             return { src };
@@ -830,13 +834,13 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         @keyframes edgeBounceTop {
             0% { transform: translateY(0); }
-            45% { transform: translateY(14px); }
+            45% { transform: translateY(8px); }
             100% { transform: translateY(0); }
         }
 
         @keyframes edgeBounceBottom {
             0% { transform: translateY(0); }
-            45% { transform: translateY(-14px); }
+            45% { transform: translateY(-6px); }
             100% { transform: translateY(0); }
         }
 
@@ -2597,7 +2601,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         });
 
         let bounceLocked = false;
+        let lastBounceAt = 0;
         let touchStartY = 0;
+        let touchStartScrollY = 0;
+        let touchStartAtTop = false;
+        let touchStartAtBottom = false;
+        let touchBounceTriggered = false;
 
         function canUseGlobalEdgeBounce(target: EventTarget | null) {
             if (!(target instanceof Element)) return true;
@@ -2629,16 +2638,20 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             return Math.ceil(window.scrollY + window.innerHeight) >= doc.scrollHeight;
         }
 
-        function triggerEdgeBounce(direction: 'top' | 'bottom') {
+        function triggerEdgeBounce(source: 'wheel' | 'touch') {
+            const now = Date.now();
+            const cooldown = source === 'touch' ? 680 : 320;
+            if (now - lastBounceAt < cooldown) return;
             if (bounceLocked) return;
+
+            lastBounceAt = now;
             bounceLocked = true;
-            const className = direction === 'top' ? 'edge-bounce-top' : 'edge-bounce-bottom';
-            document.body.classList.remove('edge-bounce-top', 'edge-bounce-bottom');
-            document.body.classList.add(className);
+            document.body.classList.remove('edge-bounce-top');
+            document.body.classList.add('edge-bounce-top');
             window.setTimeout(() => {
-                document.body.classList.remove(className);
+                document.body.classList.remove('edge-bounce-top');
                 bounceLocked = false;
-            }, 360);
+            }, 300);
         }
 
         window.addEventListener('wheel', (event) => {
@@ -2646,33 +2659,48 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
             if (event.deltaY < -8 && isAtTopEdge()) {
                 event.preventDefault();
-                triggerEdgeBounce('top');
-            } else if (event.deltaY > 8 && isAtBottomEdge()) {
-                event.preventDefault();
-                triggerEdgeBounce('bottom');
+                triggerEdgeBounce('wheel');
             }
         }, { passive: false });
 
         window.addEventListener('touchstart', (event) => {
             touchStartY = event.touches[0]?.clientY ?? 0;
+            touchStartScrollY = window.scrollY;
+            touchBounceTriggered = false;
+
+            if (!canUseGlobalEdgeBounce(event.target)) {
+                touchStartAtTop = false;
+                touchStartAtBottom = false;
+                return;
+            }
+
+            touchStartAtTop = isAtTopEdge();
+            touchStartAtBottom = isAtBottomEdge();
         }, { passive: true });
 
         window.addEventListener('touchmove', (event) => {
             if (!canUseGlobalEdgeBounce(event.target)) return;
+            if (touchBounceTriggered) return;
+
             const currentY = event.touches[0]?.clientY ?? 0;
             const deltaY = currentY - touchStartY;
+            const deltaAbs = Math.abs(deltaY);
+            const stillNearStart = Math.abs(window.scrollY - touchStartScrollY) <= 2;
 
-            if (deltaY > 16 && isAtTopEdge()) {
-                event.preventDefault();
-                triggerEdgeBounce('top');
+            if (!stillNearStart || deltaAbs < 24 || deltaAbs > 120) {
                 return;
             }
 
-            if (deltaY < -16 && isAtBottomEdge()) {
-                event.preventDefault();
-                triggerEdgeBounce('bottom');
+            if (deltaY > 16 && touchStartAtTop) {
+                triggerEdgeBounce('touch');
+                touchBounceTriggered = true;
+                return;
             }
         }, { passive: false });
+
+        window.addEventListener('touchend', () => {
+            touchBounceTriggered = false;
+        }, { passive: true });
 
         const homeSection = document.getElementById('home');
         const orientationWindow = window as unknown as Window & {
@@ -2685,7 +2713,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         function applyHeroTilt(gamma: number, beta: number) {
             if (!homeSection) return;
-            const maxShift = 14;
+            const maxShift = isMobileViewport() ? 28 : 14;
             const x = Math.max(-1, Math.min(1, gamma / 30)) * maxShift;
             const y = Math.max(-1, Math.min(1, beta / 45)) * maxShift;
             homeSection.style.setProperty('--hero-shift-x', `${x.toFixed(2)}px`);
@@ -2698,7 +2726,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
             const startTime = performance.now();
             const duration = 5200;
-            const amplitude = 10;
+            const amplitude = 20;
 
             const tick = (now: number) => {
                 const phase = ((now - startTime) % duration) / duration;
