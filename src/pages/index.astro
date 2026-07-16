@@ -72,6 +72,14 @@ function getAbsolutePathFromPublicUrl(src: string) {
     return path.join(publicRoot, decodeURI(src.replace(/^\//, '')));
 }
 
+function getPublicUrlExtension(src: string) {
+    try {
+        return path.extname(decodeURI(src)).toLowerCase();
+    } catch {
+        return path.extname(src).toLowerCase();
+    }
+}
+
 async function fileExists(targetPath: string) {
     try {
         await fs.access(targetPath);
@@ -100,7 +108,13 @@ function getSharpFormat(extension: string) {
 async function createLocalResponsiveImageData(src: string): Promise<ResponsiveImageData> {
     const normalizedSrc = normalizePublicUrl(src);
     const absolutePath = getAbsolutePathFromPublicUrl(normalizedSrc);
-    const metadata = await sharp(absolutePath).metadata();
+    let metadata;
+    try {
+        metadata = await sharp(absolutePath).metadata();
+    } catch (error) {
+        console.warn(`[responsive] skip unsupported image: ${normalizedSrc}`, error);
+        return { src: normalizedSrc };
+    }
 
     if (!metadata.width || !metadata.height) {
         return { src: normalizedSrc };
@@ -187,6 +201,13 @@ function buildPlaceholdResponsiveData(src: string): ResponsiveImageData {
 
 async function getResponsiveImageData(src: string): Promise<ResponsiveImageData> {
     if (!src) return { src };
+
+    if (isLocalPublicImageUrl(src)) {
+        const ext = getPublicUrlExtension(src);
+        if (!imageExtensions.has(ext)) {
+            return { src };
+        }
+    }
 
     if (!responsiveImageCache.has(src)) {
         responsiveImageCache.set(
@@ -492,6 +513,99 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         /* === 2. 作品展示 === */
         .filter-tabs { display: flex; gap: 14px; margin-bottom: 32px; flex-wrap: wrap; scroll-behavior: smooth; }
         .filter-tabs-shell { margin-bottom: 34px; }
+        .works-toolbar {
+            display: grid;
+            grid-template-columns: minmax(240px, 420px) 1fr;
+            gap: 14px 18px;
+            align-items: start;
+            margin-bottom: 18px;
+        }
+        .works-search {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,153,0,0.18);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+        }
+        .works-search-icon { color: #ff9900; font-size: 1rem; flex: 0 0 auto; }
+        .works-search-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #222;
+            font-size: 0.95rem;
+            min-width: 0;
+        }
+        .works-search-input::placeholder { color: #9c9c9c; }
+        .works-search-clear {
+            border: none;
+            background: #f4f4f4;
+            color: #666;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            cursor: pointer;
+            flex: 0 0 auto;
+            transition: all 0.2s ease;
+        }
+        .works-search-clear:hover { background: #ffe0b3; color: #000; }
+        .works-search-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        .works-search-stat {
+            color: #666;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 8px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .works-hotkeys {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .works-hotkey {
+            border: 1px solid rgba(255,153,0,0.18);
+            background: rgba(255,244,224,0.92);
+            color: #8a4d00;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .works-hotkey:hover { transform: translateY(-1px); background: #ffd89c; }
+        .works-no-results {
+            display: none;
+            margin: 24px 0 8px;
+            padding: 22px 18px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255,249,236,0.95), rgba(255,241,219,0.95));
+            border: 1px dashed rgba(255,153,0,0.35);
+            color: #8a5a00;
+            text-align: center;
+            font-weight: 600;
+        }
+        .works-no-results strong { color: #ff9900; }
+        .search-match {
+            background: linear-gradient(180deg, rgba(255, 230, 160, 0.95), rgba(255, 199, 92, 0.95));
+            color: #1f1f1f;
+            padding: 0 4px;
+            border-radius: 4px;
+        }
         .filter-scroll-tip {
             display: flex;
             align-items: center;
@@ -791,6 +905,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         @media (max-width: 640px) {
             .massive-grid-wrap { position: relative; padding-top: 34px; padding-bottom: 10px; }
             .filter-tabs-shell { margin-bottom: 32px; }
+            .works-toolbar { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+            .works-search-meta { justify-content: flex-start; }
             .filter-scroll-tip { gap: 8px; margin-bottom: 8px; font-size: 0.66rem; }
             .filter-scroll-track { height: 5px; }
             .filter-scroll-track::after { width: 42%; left: 12%; }
@@ -820,6 +936,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 border: 1px solid rgba(255, 153, 0, 0.5);
             }
             .filter-btn:hover, .filter-btn:active, .filter-btn:focus-visible { transform: none; }
+            .works-search { padding: 9px 12px; border-radius: 16px; }
+            .works-search-stat { font-size: 0.76rem; }
             .massive-grid:not(.mobile-main-scroll) {
                 display: grid;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1240,6 +1358,23 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         <div class="container">
             <h2 class="section-title">产品<span class="highlight">作品展示</span></h2>
             <p class="section-subtitle">涵盖亚马逊主图、旗舰店、独立站及社媒热点，专注 3C/智能硬件/小家电</p>
+            <div class="works-toolbar">
+                <div class="works-search" role="search" aria-label="作品搜索">
+                    <span class="works-search-icon" aria-hidden="true">⌕</span>
+                    <input id="worksSearchInput" class="works-search-input" type="search" placeholder="搜索作品名、品类、关键词，例如 Drone / 主图 / Air Fryer" autocomplete="off" />
+                    <button id="worksSearchClear" class="works-search-clear" type="button" aria-label="清空搜索">×</button>
+                </div>
+                <div class="works-search-meta">
+                    <div class="works-search-stat" id="worksSearchStat">已显示全部作品</div>
+                    <div class="works-hotkeys" aria-label="快速搜索关键词">
+                        <button class="works-hotkey" type="button" data-search-keyword="Drone">Drone</button>
+                        <button class="works-hotkey" type="button" data-search-keyword="Robot Vacuum">Robot Vacuum</button>
+                        <button class="works-hotkey" type="button" data-search-keyword="Ice Maker">Ice Maker</button>
+                        <button class="works-hotkey" type="button" data-search-keyword="Air Fryer">Air Fryer</button>
+                        <button class="works-hotkey" type="button" data-search-keyword="Projector">Projector</button>
+                    </div>
+                </div>
+            </div>
             <div class="filter-tabs-shell">
                 <div class="filter-scroll-tip" aria-hidden="true">
                     <span>左右滑动查看更多分类</span>
@@ -1373,157 +1508,15 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                         <div class="project-gallery"></div>
                     </div>
                 ))}
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/4a90e2/fff?text=Robot+Vacuum', imageSizes.card)} alt="扫地机主图"></div>
-                    <div class="project-info"><h4>扫地机器人 - 视觉升级</h4><span>亚马逊主图 / 点击率 +18%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/ff6b6b/fff?text=Hair+Dryer', imageSizes.card)} alt="电吹风主图"></div>
-                    <div class="project-info"><h4>电吹风 - 视觉重做</h4><span>亚马逊主图 / CTR +22%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/2ecc71/fff?text=Air+Purifier', imageSizes.card)} alt="空气净化器主图"></div>
-                    <div class="project-info"><h4>空气净化器 - 视觉升级</h4><span>亚马逊主图 / 转化率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/9b59b6/fff?text=Portable+Fan', imageSizes.card)} alt="便携风扇主图"></div>
-                    <div class="project-info"><h4>便携风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +19%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/34495e/fff?text=Coffee+Maker', imageSizes.card)} alt="咖啡机主图"></div>
-                    <div class="project-info"><h4>咖啡机 - 主图重做</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/f39c12/fff?text=Massage+Gun', imageSizes.card)} alt="按摩枪主图"></div>
-                    <div class="project-info"><h4>按摩枪 - 主图升级</h4><span>亚马逊主图 / 关注率提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/1abc9c/fff?text=Security+Cam', imageSizes.card)} alt="监控摄像头主图"></div>
-                    <div class="project-info"><h4>智能摄像头 - 主图优化</h4><span>亚马逊主图 / 点击率 +16%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/7f8c8d/fff?text=Desk+Lamp', imageSizes.card)} alt="台灯主图"></div>
-                    <div class="project-info"><h4>台灯 - 视觉重构</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/e67e22/fff?text=Water+Bottle', imageSizes.card)} alt="保温杯主图"></div>
-                    <div class="project-info"><h4>保温杯 - 主图迭代</h4><span>亚马逊主图 / 视觉统一提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/95a5a6/fff?text=Travel+Bag', imageSizes.card)} alt="旅行包主图"></div>
-                    <div class="project-info"><h4>旅行包 - 视觉优化</h4><span>亚马逊主图 / 关注提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/00b894/fff?text=Kitchen+Scale', imageSizes.card)} alt="厨房秤主图"></div>
-                    <div class="project-info"><h4>厨房秤 - 主图焕新</h4><span>亚马逊主图 / 购买转化 +12%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/6c5ce7/fff?text=Bluetooth+Speaker', imageSizes.card)} alt="蓝牙音箱主图"></div>
-                    <div class="project-info"><h4>蓝牙音箱 - 视觉强化</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/0984e3/fff?text=Phone+Stand', imageSizes.card)} alt="手机支架主图"></div>
-                    <div class="project-info"><h4>手机支架 - 主图升级</h4><span>亚马逊主图 / 点击率 +14%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/bc6c25/fff?text=Car+Vacuum', imageSizes.card)} alt="车载吸尘器主图"></div>
-                    <div class="project-info"><h4>车载吸尘器 - 视觉重做</h4><span>亚马逊主图 / 浏览转化提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/d63031/fff?text=Sleep+Mask', imageSizes.card)} alt="睡眠眼罩主图"></div>
-                    <div class="project-info"><h4>睡眠眼罩 - 主图优化</h4><span>亚马逊主图 / 关注率 +11%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/2d3436/fff?text=Mini+Projector', imageSizes.card)} alt="迷你投影仪主图"></div>
-                    <div class="project-info"><h4>迷你投影仪 - 视觉升级</h4><span>亚马逊主图 / 视觉辨识度提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/8e44ad/fff?text=Smart+Scale', imageSizes.card)} alt="智能体脂秤主图"></div>
-                    <div class="project-info"><h4>智能体脂秤 - 主图重做</h4><span>亚马逊主图 / 购买转化 +16%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/1e3799/fff?text=Desk+Fan', imageSizes.card)} alt="桌面风扇主图"></div>
-                    <div class="project-info"><h4>桌面风扇 - 视觉优化</h4><span>亚马逊主图 / 点击率 +13%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/27ae60/fff?text=Air+Fryer', imageSizes.card)} alt="空气炸锅主图"></div>
-                    <div class="project-info"><h4>空气炸锅 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/ff7675/fff?text=Hair+Curler', imageSizes.card)} alt="卷发器主图"></div>
-                    <div class="project-info"><h4>卷发器 - 视觉重构</h4><span>亚马逊主图 / 点击率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/00cec9/fff?text=USB+Hub', imageSizes.card)} alt="USB扩展坞主图"></div>
-                    <div class="project-info"><h4>USB 扩展坞 - 主图优化</h4><span>亚马逊主图 / 关注率 +10%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/636e72/fff?text=Pet+Camera', imageSizes.card)} alt="宠物摄像头主图"></div>
-                    <div class="project-info"><h4>宠物摄像头 - 视觉升级</h4><span>亚马逊主图 / 购买转化 +14%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/e17055/fff?text=Water+Flosser', imageSizes.card)} alt="冲牙器主图"></div>
-                    <div class="project-info"><h4>冲牙器 - 主图重做</h4><span>亚马逊主图 / 点击率 +17%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/74b9ff/fff?text=LED+Lamp', imageSizes.card)} alt="LED台灯主图"></div>
-                    <div class="project-info"><h4>LED 台灯 - 视觉优化</h4><span>亚马逊主图 / 关注度提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/55efc4/fff?text=Smart+Plug', imageSizes.card)} alt="智能插座主图"></div>
-                    <div class="project-info"><h4>智能插座 - 主图升级</h4><span>亚马逊主图 / 购买转化 +13%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/ff9f1c/fff?text=Electric+Toothbrush', imageSizes.card)} alt="电动牙刷主图"></div>
-                    <div class="project-info"><h4>电动牙刷 - 主图优化</h4><span>亚马逊主图 / 点击率 +12%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/81ecec/fff?text=Robot+Mop', imageSizes.card)} alt="扫地机器人拖地版主图"></div>
-                    <div class="project-info"><h4>扫地机器人拖地版 - 主图升级</h4><span>亚马逊主图 / 浏览停留提升</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/6ab04c/fff?text=Portable+Charger', imageSizes.card)} alt="便携充电器主图"></div>
-                    <div class="project-info"><h4>便携充电器 - 视觉重构</h4><span>亚马逊主图 / 关注率 +15%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
-                <div class="project-card" data-type="main" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80"]'>
-                    <div class="project-thumb"><img {...getCatalogImageAttrs('https://placehold.co/400x300/fd79a8/fff?text=Beauty+Tool', imageSizes.card)} alt="美容仪主图"></div>
-                    <div class="project-info"><h4>美容仪 - 主图优化</h4><span>亚马逊主图 / 购买转化 +11%</span><div class="gallery-hint">点击查看更多</div></div>
-                    <div class="project-gallery"></div>
-                </div>
                 </div>
                 <div class="work-pagination" id="workPagination" hidden>
                     <button class="page-nav prev" type="button" aria-label="上一页">上一页</button>
                     <div class="page-number-list" id="workPageNumbers" aria-label="分页数字"></div>
                     <div class="page-visual" id="workPageVisual" aria-label="分页可视化导航"></div>
                     <button class="page-nav next" type="button" aria-label="下一页">下一页</button>
+                </div>
+                <div class="works-no-results" id="worksNoResults">
+                    没有找到匹配的作品，试试 <strong>Drone</strong>、<strong>主图</strong> 或 <strong>Air Fryer</strong>
                 </div>
             </div>
         </div>
@@ -1783,8 +1776,13 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         const mainCardsPerPage = 32;
         const mobileUnifiedFilters = new Set(['main', 'aplus', 'video', 'brand', 'packaging', 'ces', 'other']);
         let currentFilter = 'waterfall';
+        let currentSearchQuery = '';
         let currentMainPage = 1;
         let visibleMainCards: HTMLElement[] = [];
+        const worksSearchInput = document.getElementById('worksSearchInput') as HTMLInputElement | null;
+        const worksSearchClear = document.getElementById('worksSearchClear');
+        const worksSearchStat = document.getElementById('worksSearchStat');
+        const worksNoResults = document.getElementById('worksNoResults');
 
         function isDesktopViewport() {
             return window.matchMedia('(min-width: 769px)').matches;
@@ -1792,6 +1790,61 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         function isMobileViewport() {
             return window.matchMedia('(max-width: 768px)').matches;
+        }
+
+        function normalizeSearchText(value: string) {
+            return value
+                .trim()
+                .normalize('NFKC')
+                .toLowerCase()
+                .replace(/[\s\p{P}\p{S}]+/gu, '');
+        }
+
+        function escapeHtml(value: string) {
+            return value
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#39;');
+        }
+
+        function getCardSearchText(card: HTMLElement) {
+            if (!card.dataset.searchText) {
+                const title = card.querySelector('h4')?.textContent || '';
+                const subtitle = card.querySelector('.project-info span')?.textContent || '';
+                const altText = Array.from(card.querySelectorAll('img')).map((img) => img.alt || '').join(' ');
+                card.dataset.searchText = normalizeSearchText([title, subtitle, altText, card.dataset.type || '', card.dataset.source || ''].join(' '));
+            }
+
+            return card.dataset.searchText || '';
+        }
+
+        function setCardTitleHighlight(card: HTMLElement, query: string) {
+            const title = card.querySelector('h4');
+            if (!title) return;
+
+            if (!title.dataset.originalText) {
+                title.dataset.originalText = title.textContent || '';
+            }
+
+            const originalText = title.dataset.originalText || '';
+            if (!query) {
+                title.innerHTML = escapeHtml(originalText);
+                return;
+            }
+
+            const lowerOriginal = originalText.toLowerCase();
+            const index = lowerOriginal.indexOf(query);
+            if (index < 0) {
+                title.innerHTML = escapeHtml(originalText);
+                return;
+            }
+
+            const before = originalText.slice(0, index);
+            const match = originalText.slice(index, index + query.length);
+            const after = originalText.slice(index + query.length);
+            title.innerHTML = `${escapeHtml(before)}<span class="search-match">${escapeHtml(match)}</span>${escapeHtml(after)}`;
         }
 
         function toggleMainMobileScrollLayout() {
@@ -1882,8 +1935,69 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             }
         }
 
-        function filterWorks(type: string, button: HTMLElement | null) {
+        function updateWorksSearchStatus(visibleCount: number, totalCount: number, isWaterfall = false) {
+            if (worksSearchStat) {
+                if (isWaterfall) {
+                    worksSearchStat.textContent = '当前为瀑布图集';
+                } else if (!currentSearchQuery) {
+                    worksSearchStat.textContent = `已显示全部作品 · ${visibleCount}/${totalCount}`;
+                } else {
+                    worksSearchStat.textContent = `找到 ${visibleCount}/${totalCount} 个结果`;
+                }
+            }
+
+            if (worksNoResults) {
+                worksNoResults.style.display = !currentSearchQuery || visibleCount > 0 ? 'none' : 'block';
+            }
+        }
+
+        function applyWorksFilterState() {
             const cards = document.querySelectorAll<HTMLElement>('.project-card');
+            const normalizedQuery = normalizeSearchText(currentSearchQuery);
+            const filterType = normalizedQuery ? 'all' : currentFilter;
+            const isWaterfall = filterType === 'waterfall' && !normalizedQuery;
+
+            setWaterfallMode(isWaterfall);
+
+            if (isWaterfall) {
+                cards.forEach((card) => setCardTitleHighlight(card, ''));
+                updateWorksSearchStatus(0, 0, true);
+                return;
+            }
+
+            const visibleCards: HTMLElement[] = [];
+            const visibleDirectoryMainCards: HTMLElement[] = [];
+
+            cards.forEach((card) => {
+                const categoryMatches = filterType === 'all'
+                    ? true
+                    : card.dataset.type === filterType;
+                const queryMatches = !normalizedQuery || getCardSearchText(card).includes(normalizedQuery);
+                const shouldShow = categoryMatches && queryMatches;
+
+                card.style.display = shouldShow ? '' : 'none';
+                setCardTitleHighlight(card, shouldShow ? normalizedQuery : '');
+
+                if (shouldShow) {
+                    visibleCards.push(card);
+                    if (card.dataset.type === 'main' && card.dataset.source === 'directory') {
+                        visibleDirectoryMainCards.push(card);
+                    }
+                }
+            });
+
+            if (filterType === 'all') {
+                refreshMainPagination(visibleDirectoryMainCards);
+            } else {
+                visibleMainCards = [];
+                if (workPagination) workPagination.hidden = true;
+            }
+
+            updateWorksSearchStatus(visibleCards.length, cards.length);
+            toggleMainMobileScrollLayout();
+        }
+
+        function filterWorks(type: string, button: HTMLElement | null) {
             const buttons = document.querySelectorAll<HTMLElement>('.filter-btn');
             currentFilter = type;
 
@@ -1892,31 +2006,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 button.classList.add('active');
             }
 
-            if (type === 'waterfall') {
-                setWaterfallMode(true);
-                return;
-            }
-
-            setWaterfallMode(false);
-
-            cards.forEach(card => {
-                const isDirectoryMainCard = card.dataset.type === 'main' && card.dataset.source === 'directory';
-                if (type === 'all' || (type === 'main' && isDirectoryMainCard) || (type !== 'main' && card.dataset.type === type)) {
-                    card.style.removeProperty('display');
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            if (type === 'main') {
-                const mainCards = Array.from(cards).filter((card) => card.dataset.type === 'main' && card.dataset.source === 'directory');
-                refreshMainPagination(mainCards);
-            } else {
-                visibleMainCards = [];
-                if (workPagination) workPagination.hidden = true;
-            }
-
-            toggleMainMobileScrollLayout();
+            applyWorksFilterState();
         }
 
         paginationPrevBtn?.addEventListener('click', () => {
@@ -1930,21 +2020,80 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         window.addEventListener('resize', () => {
             toggleMainMobileScrollLayout();
 
-            if (currentFilter !== 'main') return;
-
-            const cards = Array.from(document.querySelectorAll<HTMLElement>('.project-card')).filter(
-                (card) => card.dataset.type === 'main' && card.dataset.source === 'directory'
-            );
-            refreshMainPagination(cards);
+            if (currentFilter === 'main' || currentSearchQuery) {
+                applyWorksFilterState();
+            }
         });
 
         document.querySelectorAll<HTMLElement>('.filter-btn').forEach(button => {
             button.addEventListener('click', () => {
+                const hasActiveSearchQuery = normalizeSearchText(currentSearchQuery).length > 0;
+                if (hasActiveSearchQuery && worksSearchInput) {
+                    worksSearchInput.value = '';
+                    currentSearchQuery = '';
+                }
+
                 filterWorks(button.dataset.filter || 'all', button);
                 // Add glow effect
                 button.classList.add('glow-active');
                 setTimeout(() => button.classList.remove('glow-active'), 800);
             });
+        });
+
+        function handleWorksSearchUpdate() {
+            if (!worksSearchInput) return;
+
+            currentSearchQuery = worksSearchInput.value;
+
+            applyWorksFilterState();
+        }
+
+        worksSearchInput?.addEventListener('input', handleWorksSearchUpdate);
+        worksSearchInput?.addEventListener('keyup', handleWorksSearchUpdate);
+        worksSearchInput?.addEventListener('search', handleWorksSearchUpdate);
+        worksSearchInput?.addEventListener('change', handleWorksSearchUpdate);
+
+        worksSearchClear?.addEventListener('click', () => {
+            if (worksSearchInput) {
+                worksSearchInput.value = '';
+                worksSearchInput.focus();
+            }
+            currentSearchQuery = '';
+
+            if (currentFilter === 'waterfall') {
+                const waterfallButton = document.querySelector<HTMLElement>('.filter-btn[data-filter="waterfall"]');
+                filterWorks('waterfall', waterfallButton);
+                return;
+            }
+
+            applyWorksFilterState();
+        });
+
+        document.querySelectorAll<HTMLElement>('.works-hotkey').forEach((button) => {
+            button.addEventListener('click', () => {
+                const keyword = button.dataset.searchKeyword || '';
+                if (!worksSearchInput) return;
+
+                worksSearchInput.value = keyword;
+                currentSearchQuery = keyword;
+
+                applyWorksFilterState();
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            const isSearchShortcut = event.key === '/' || ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k');
+
+            if (isSearchShortcut && document.activeElement !== worksSearchInput) {
+                event.preventDefault();
+                worksSearchInput?.focus();
+                worksSearchInput?.select();
+                return;
+            }
+
+            if (event.key === 'Escape' && document.activeElement === worksSearchInput) {
+                worksSearchClear?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            }
         });
 
         const defaultFilterBtn = document.querySelector<HTMLElement>('.filter-btn.active');
