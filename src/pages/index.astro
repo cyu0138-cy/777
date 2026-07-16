@@ -442,7 +442,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
     <style>
         /* === 全局重置与基础样式 === */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; overscroll-behavior-y: none; }
         body { 
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
             line-height: 1.6; 
@@ -450,8 +450,15 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             background: linear-gradient(180deg, #faf7f2 0%, #f4f4f4 100%); 
             overflow-x: hidden; 
         }
+        body.media-protect,
+        body.media-protect * {
+            -webkit-touch-callout: none;
+        }
+        body.edge-bounce-top { animation: edgeBounceTop 0.34s cubic-bezier(0.2, 0.7, 0.2, 1); }
+        body.edge-bounce-bottom { animation: edgeBounceBottom 0.34s cubic-bezier(0.2, 0.7, 0.2, 1); }
         a { text-decoration: none; color: inherit; transition: 0.3s; }
         img, video { max-width: 100%; display: block; }
+        img, video { -webkit-user-drag: none; user-select: none; }
         img { height: auto; }
 
         /* === 导航栏 === */
@@ -493,7 +500,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         #home { 
             position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; 
             text-align: center; background: linear-gradient(rgba(0,0,0,0.58), rgba(0,0,0,0.7)), url('/1shouye/TOUTU.jpg'); 
-            background-size: cover; background-position: center center; color: #fff; padding-top: 80px; 
+            background-size: cover; background-position: calc(50% + var(--hero-shift-x, 0px)) calc(50% + var(--hero-shift-y, 0px)); color: #fff; padding-top: 80px; 
             animation: bgPan 18s ease-in-out infinite;
         }
         @media (min-width: 769px) {
@@ -816,9 +823,21 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         /* subtle background pan for hero */
         @keyframes bgPan {
-            0% { background-position: center top; }
-            50% { background-position: center center; }
-            100% { background-position: center top; }
+            0% { background-position: calc(50% + var(--hero-shift-x, 0px)) calc(42% + var(--hero-shift-y, 0px)); }
+            50% { background-position: calc(50% + var(--hero-shift-x, 0px)) calc(50% + var(--hero-shift-y, 0px)); }
+            100% { background-position: calc(50% + var(--hero-shift-x, 0px)) calc(42% + var(--hero-shift-y, 0px)); }
+        }
+
+        @keyframes edgeBounceTop {
+            0% { transform: translateY(0); }
+            45% { transform: translateY(14px); }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes edgeBounceBottom {
+            0% { transform: translateY(0); }
+            45% { transform: translateY(-14px); }
+            100% { transform: translateY(0); }
         }
 
         /* floating hero title */
@@ -1370,7 +1389,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                         <button class="works-hotkey" type="button" data-search-keyword="Drone">Drone</button>
                         <button class="works-hotkey" type="button" data-search-keyword="Robot Vacuum">Robot Vacuum</button>
                         <button class="works-hotkey" type="button" data-search-keyword="Ice Maker">Ice Maker</button>
-                        <button class="works-hotkey" type="button" data-search-keyword="Air Fryer">Air Fryer</button>
+                        <button class="works-hotkey" type="button" data-search-keyword="Mirror Dash Cam">Mirror Dash Cam</button>
                         <button class="works-hotkey" type="button" data-search-keyword="Projector">Projector</button>
                     </div>
                 </div>
@@ -1986,7 +2005,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
 
-            if (filterType === 'all') {
+            if (filterType === 'main') {
                 refreshMainPagination(visibleDirectoryMainCards);
             } else {
                 visibleMainCards = [];
@@ -2154,7 +2173,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             lightboxGallery.innerHTML = media.map((item, mediaIndex) => `
                 <div class="lightbox-media-frame">
                     ${item.type === 'video'
-                        ? `<video data-lightbox-item controls autoplay loop muted playsinline preload="metadata"><source src="${item.src}" type="${getMediaMimeType(item.src)}" /></video>`
+                        ? `<video data-lightbox-item controls controlslist="nodownload noplaybackrate noremoteplayback nofullscreen" disablepictureinpicture disableremoteplayback autoplay loop muted playsinline preload="metadata"><source src="${item.src}" type="${getMediaMimeType(item.src)}" /></video>`
                         : `<img data-lightbox-item ${getResponsiveImageTagAttributes(item.src, '100vw')} alt="作品图 ${mediaIndex + 1}">`
                     }
                 </div>
@@ -2248,48 +2267,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             const sourceImages = customImages.length ? customImages : baseImages;
             return Array.from({ length: sourceImages.length }, (_, index) => ({ type: 'image' as const, src: sourceImages[index] }));
         }
-
-        function ensureMainCardsSupportVideos() {
-            const defaultMainVideos = [
-                'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
-                'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm'
-            ];
-
-            document.querySelectorAll<HTMLElement>('.project-card[data-type="main"]').forEach((card) => {
-                if (card.dataset.source === 'directory') return;
-
-                let customVideos: string[] = [];
-                try {
-                    customVideos = JSON.parse(card.dataset.videos || '[]') as string[];
-                } catch {
-                    customVideos = [];
-                }
-
-                if (!customVideos.length) {
-                    customVideos = defaultMainVideos;
-                    card.dataset.videos = JSON.stringify(customVideos);
-                }
-
-                const thumb = card.querySelector<HTMLElement>('.project-thumb');
-                if (!thumb || thumb.querySelector('.project-preview-video')) return;
-
-                const coverImg = thumb.querySelector<HTMLImageElement>('img');
-                if (!coverImg) return;
-
-                const posterSrc = coverImg.getAttribute('src') || '';
-                const videoSrc = customVideos[0];
-                if (!videoSrc) return;
-
-                thumb.innerHTML = `
-                    <video class="project-preview-video" autoplay muted loop playsinline preload="metadata" poster="${posterSrc}" aria-label="主图视频预览">
-                        <source src="${videoSrc}" type="${getMediaMimeType(videoSrc)}" />
-                    </video>
-                    ${posterSrc ? `<img class="video-fallback-image" ${getResponsiveImageTagAttributes(posterSrc, '(max-width: 480px) 50vw, (max-width: 768px) 33vw, 280px')} alt="${coverImg.alt || '主图封面'}" />` : ''}
-                `;
-            });
-        }
-
-        ensureMainCardsSupportVideos();
 
         document.querySelectorAll<HTMLElement>('.project-card').forEach(card => {
             card.addEventListener('click', () => {
@@ -2580,6 +2557,193 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 // Add glow to any other interactive elements if needed
             }
         }, true);
+
+        // Media protection: reduce direct save/download entry points on both mobile and desktop.
+        document.body.classList.add('media-protect');
+
+        document.querySelectorAll<HTMLImageElement | HTMLVideoElement>('img, video').forEach((mediaEl) => {
+            mediaEl.setAttribute('draggable', 'false');
+            if (mediaEl instanceof HTMLVideoElement) {
+                mediaEl.setAttribute('controlsList', 'nodownload noplaybackrate noremoteplayback nofullscreen');
+                mediaEl.setAttribute('disablepictureinpicture', '');
+                mediaEl.setAttribute('disableremoteplayback', '');
+                mediaEl.disablePictureInPicture = true;
+            }
+        });
+
+        document.addEventListener('contextmenu', (event) => {
+            const target = event.target as HTMLElement | null;
+            if (!target) return;
+            if (target.closest('input, textarea')) return;
+            if (target.closest('img, video, .project-card, .waterfall-item, .lightbox-overlay')) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('dragstart', (event) => {
+            const target = event.target as HTMLElement | null;
+            if (!target) return;
+            if (target.closest('img, video')) {
+                event.preventDefault();
+            }
+        });
+
+        document.addEventListener('selectstart', (event) => {
+            const target = event.target as HTMLElement | null;
+            if (!target) return;
+            if (target.closest('img, video')) {
+                event.preventDefault();
+            }
+        });
+
+        let bounceLocked = false;
+        let touchStartY = 0;
+
+        function canUseGlobalEdgeBounce(target: EventTarget | null) {
+            if (!(target instanceof Element)) return true;
+            if (target.closest('.lightbox-scroll-area, .mobile-nav.open')) return false;
+
+            let current: Element | null = target;
+            while (current && current !== document.body) {
+                const style = window.getComputedStyle(current);
+                const overflowY = style.overflowY;
+                const isScrollableY = (overflowY === 'auto' || overflowY === 'scroll')
+                    && (current as HTMLElement).scrollHeight > (current as HTMLElement).clientHeight;
+
+                if (isScrollableY) {
+                    return false;
+                }
+
+                current = current.parentElement;
+            }
+
+            return true;
+        }
+
+        function isAtTopEdge() {
+            return window.scrollY <= 0;
+        }
+
+        function isAtBottomEdge() {
+            const doc = document.documentElement;
+            return Math.ceil(window.scrollY + window.innerHeight) >= doc.scrollHeight;
+        }
+
+        function triggerEdgeBounce(direction: 'top' | 'bottom') {
+            if (bounceLocked) return;
+            bounceLocked = true;
+            const className = direction === 'top' ? 'edge-bounce-top' : 'edge-bounce-bottom';
+            document.body.classList.remove('edge-bounce-top', 'edge-bounce-bottom');
+            document.body.classList.add(className);
+            window.setTimeout(() => {
+                document.body.classList.remove(className);
+                bounceLocked = false;
+            }, 360);
+        }
+
+        window.addEventListener('wheel', (event) => {
+            if (!canUseGlobalEdgeBounce(event.target)) return;
+
+            if (event.deltaY < -8 && isAtTopEdge()) {
+                event.preventDefault();
+                triggerEdgeBounce('top');
+            } else if (event.deltaY > 8 && isAtBottomEdge()) {
+                event.preventDefault();
+                triggerEdgeBounce('bottom');
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchstart', (event) => {
+            touchStartY = event.touches[0]?.clientY ?? 0;
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (event) => {
+            if (!canUseGlobalEdgeBounce(event.target)) return;
+            const currentY = event.touches[0]?.clientY ?? 0;
+            const deltaY = currentY - touchStartY;
+
+            if (deltaY > 16 && isAtTopEdge()) {
+                event.preventDefault();
+                triggerEdgeBounce('top');
+                return;
+            }
+
+            if (deltaY < -16 && isAtBottomEdge()) {
+                event.preventDefault();
+                triggerEdgeBounce('bottom');
+            }
+        }, { passive: false });
+
+        const homeSection = document.getElementById('home');
+        const orientationWindow = window as unknown as Window & {
+            DeviceOrientationEvent?: typeof DeviceOrientationEvent & {
+                requestPermission?: () => Promise<'granted' | 'denied'>;
+            };
+        };
+        const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent);
+        let orientationEnabled = false;
+
+        function applyHeroTilt(gamma: number, beta: number) {
+            if (!homeSection) return;
+            const maxShift = 14;
+            const x = Math.max(-1, Math.min(1, gamma / 30)) * maxShift;
+            const y = Math.max(-1, Math.min(1, beta / 45)) * maxShift;
+            homeSection.style.setProperty('--hero-shift-x', `${x.toFixed(2)}px`);
+            homeSection.style.setProperty('--hero-shift-y', `${(-y).toFixed(2)}px`);
+        }
+
+        function startIOSHeroAutoDrift() {
+            if (!homeSection) return;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const startTime = performance.now();
+            const duration = 5200;
+            const amplitude = 10;
+
+            const tick = (now: number) => {
+                const phase = ((now - startTime) % duration) / duration;
+                const x = Math.sin(phase * Math.PI * 2) * amplitude;
+                homeSection.style.setProperty('--hero-shift-x', `${x.toFixed(2)}px`);
+                homeSection.style.setProperty('--hero-shift-y', '0px');
+                window.requestAnimationFrame(tick);
+            };
+
+            window.requestAnimationFrame(tick);
+        }
+
+        function bindOrientationListener() {
+            if (orientationEnabled) return;
+            orientationEnabled = true;
+            window.addEventListener('deviceorientation', (event) => {
+                if (typeof event.gamma !== 'number' || typeof event.beta !== 'number') return;
+                applyHeroTilt(event.gamma, event.beta);
+            }, { passive: true });
+        }
+
+        if (isIOSDevice && homeSection) {
+            startIOSHeroAutoDrift();
+        }
+
+        if (!isIOSDevice && homeSection && orientationWindow.DeviceOrientationEvent) {
+            if (typeof orientationWindow.DeviceOrientationEvent.requestPermission === 'function') {
+                const requestMotionPermission = () => {
+                    orientationWindow.DeviceOrientationEvent?.requestPermission?.()
+                        .then((state) => {
+                            if (state === 'granted') {
+                                bindOrientationListener();
+                            }
+                        })
+                        .catch(() => {
+                            // User may deny motion permission.
+                        });
+                };
+
+                homeSection.addEventListener('click', requestMotionPermission, { once: true });
+                homeSection.addEventListener('touchstart', requestMotionPermission, { once: true, passive: true });
+            } else {
+                bindOrientationListener();
+            }
+        }
     </script>
 </body>
 </html>
