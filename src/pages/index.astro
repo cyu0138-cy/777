@@ -699,14 +699,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         }
         .waterfall-panel.active { display: block; }
         .waterfall-grid {
-            column-count: 5;
-            column-gap: 0;
+            position: relative;
             background: #fff;
         }
         .waterfall-item {
-            width: 100%;
-            display: block;
-            break-inside: avoid;
+            position: absolute;
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -731,6 +729,76 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         }
         .waterfall-block:hover img { transform: scale(1.02); }
         .waterfall-block:hover video { transform: scale(1.02); }
+        .waterfall-item.wf-hidden { display: none; }
+        .waterfall-more-wrap {
+            display: flex;
+            justify-content: center;
+            padding: 18px 0 22px;
+            background: #fff;
+        }
+        .waterfall-more-wrap.wf-all-shown { display: none; }
+        .waterfall-done-wrap {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            padding: 28px 16px 34px;
+            background: linear-gradient(to bottom, #fff 0%, rgba(255, 248, 240, 0.7) 100%);
+        }
+        .waterfall-done-wrap.wf-all-shown { display: flex; }
+        .waterfall-done-label {
+            font-size: 12px;
+            color: #c0a898;
+            letter-spacing: 0.12em;
+            user-select: none;
+        }
+        .waterfall-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 44px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(255, 120, 40, 0.55);
+            background: linear-gradient(135deg, rgba(255, 248, 235, 0.95) 0%, rgba(255, 235, 200, 0.8) 100%);
+            color: #c05010;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.04em;
+            box-shadow: 0 2px 10px rgba(255, 120, 40, 0.1);
+            transition: background 0.22s, box-shadow 0.22s, transform 0.18s, color 0.18s;
+            animation: wfBackFloat 2s ease-in-out infinite;
+        }
+        .waterfall-back-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 180, 80, 0.9) 0%, rgba(255, 80, 20, 0.8) 100%);
+            color: #fff;
+            border-color: rgba(255, 153, 0, 0.8);
+            box-shadow: 0 6px 20px rgba(255, 100, 20, 0.35);
+            transform: translateY(-3px);
+            animation: none;
+        }
+        @keyframes wfBackFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .waterfall-more-btn {
+            padding: 10px 36px;
+            border-radius: 999px;
+            border: 1.5px solid rgba(255, 120, 40, 0.7);
+            background: linear-gradient(135deg, rgba(255, 180, 80, 0.15) 0%, rgba(255, 80, 20, 0.08) 100%);
+            color: #c74a10;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.22s, box-shadow 0.22s, transform 0.18s;
+        }
+        .waterfall-more-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 180, 80, 0.8) 0%, rgba(255, 80, 20, 0.7) 100%);
+            color: #fff;
+            border-color: rgba(255, 153, 0, 0.7);
+            box-shadow: 0 4px 16px rgba(255, 153, 0, 0.3);
+            transform: translateY(-2px);
+        }
         
         .massive-grid-wrap { position: relative; }
         .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; align-items: start; }
@@ -989,23 +1057,25 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             .works-search { padding: 9px 12px; border-radius: 16px; }
             .works-search-stat { font-size: 0.76rem; }
             .massive-grid:not(.mobile-main-scroll) {
-                display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 10px;
+                display: block;
+                column-count: 2;
+                column-gap: 8px;
+                column-fill: auto;
                 overflow: visible;
                 padding: 2px 2px 8px;
-                transform: none;
             }
             #works .massive-grid:not(.mobile-main-scroll) > .project-card {
                 width: 100%;
                 min-width: 0;
                 max-width: none;
                 height: auto;
-                aspect-ratio: 2 / 3;
+                aspect-ratio: auto;
                 display: flex;
                 flex-direction: column;
                 border-radius: 10px;
                 transform: none;
+                break-inside: avoid;
+                margin-bottom: 8px;
             }
             #works .project-thumb { flex: 1 1 auto; min-height: 0; }
             #works .project-thumb { aspect-ratio: auto; height: auto; }
@@ -1027,7 +1097,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             .project-gallery { padding: 0 10px 10px; }
             .project-card .gallery-hint { font-size: 0.62rem; }
             .massive-grid-wrap::after { content: none; }
-            .waterfall-grid { column-count: 3; }
+            .waterfall-grid { /* 3-col handled by JS */ }
             .contact-status { bottom: -18px; }
             .work-pagination { margin-top: 16px; gap: 10px; }
             .work-pagination .page-number { width: 30px; height: 30px; font-size: 0.78rem; }
@@ -1195,8 +1265,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             .hero-stats { flex-direction: column; gap: 20px; }
             .methodology-wrapper { grid-template-columns: 1fr; }
             .method-steps { padding-left: 0; }
-            .massive-grid:not(.mobile-main-scroll) { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
-            .waterfall-grid { column-count: 4; }
+            .massive-grid:not(.mobile-main-scroll) { column-count: 2; column-gap: 12px; column-fill: auto; display: block; }
+            .waterfall-grid { /* 4-col handled by JS */ }
             .project-thumb { height: 170px; }
             .hero-tag { padding: 6px 12px; font-size: 0.78rem; }
             .hero-title .highlight { display: inline-block; }
@@ -1292,7 +1362,7 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 10px;
             }
-            .waterfall-grid { column-count: 2; }
+            .waterfall-grid { /* 2-col handled by JS */ }
             .project-card { width: 100%; }
             .project-thumb { height: auto; aspect-ratio: auto; }
             .project-info { padding: 8px; }
@@ -1473,8 +1543,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             </div>
             <div class="waterfall-panel" id="waterfallPanel">
                 <div class="waterfall-grid" id="waterfallGrid">
-                {waterfallImages.map((image) => (
-                    <figure class="waterfall-item" data-folder={image.folderLabel}>
+                {waterfallImages.map((image, i) => (
+                    <figure class="waterfall-item" data-folder={image.folderLabel} data-wf-index={i}>
                         <div class="waterfall-block">
                             {image.type === 'video' ? (
                                 <video class="waterfall-preview-video" autoplay muted loop playsinline preload="metadata" aria-label={image.alt}>
@@ -1486,6 +1556,13 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                         </div>
                     </figure>
                 ))}
+                </div>
+                <div class="waterfall-more-wrap" id="waterfallMoreWrap">
+                    <button class="waterfall-more-btn" id="waterfallMoreBtn" type="button">显示更多</button>
+                </div>
+                <div class="waterfall-done-wrap" id="waterfallDoneWrap">
+                    <span class="waterfall-done-label">— 已展示全部图集 —</span>
+                    <button class="waterfall-back-btn" id="waterfallBackBtn" type="button">&#8679; 返回开始</button>
                 </div>
             </div>
             <div class="massive-grid-wrap" id="workGridWrap">
@@ -1854,6 +1931,113 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         const paginationPrevBtn = workPagination?.querySelector<HTMLButtonElement>('.page-nav.prev');
         const paginationNextBtn = workPagination?.querySelector<HTMLButtonElement>('.page-nav.next');
         const waterfallPanel = document.getElementById('waterfallPanel');
+        const waterfallMoreBtn = document.getElementById('waterfallMoreBtn');
+        const waterfallMoreWrap = document.getElementById('waterfallMoreWrap');
+        const waterfallDoneWrap = document.getElementById('waterfallDoneWrap');
+        const WF_BATCH = 39;
+        let wfShownCount = WF_BATCH;
+
+        // === JS Masonry 布局 ===
+        function getWaterfallCols(): number {
+            const w = window.innerWidth;
+            if (w <= 480) return 2;
+            if (w <= 768) return 4;
+            return 5;
+        }
+
+        let _wfRaf = 0;
+        function scheduleWaterfallLayout() {
+            if (_wfRaf) cancelAnimationFrame(_wfRaf);
+            _wfRaf = requestAnimationFrame(() => {
+                _wfRaf = 0;
+                layoutWaterfall();
+            });
+        }
+
+        function layoutWaterfall() {
+            const grid = document.getElementById('waterfallGrid') as HTMLElement | null;
+            if (!grid) return;
+            const gridWidth = grid.offsetWidth;
+            if (!gridWidth) return;
+            const cols = getWaterfallCols();
+            const colW = Math.floor(gridWidth / cols);
+            const colH = new Array<number>(cols).fill(0);
+            const visibleItems = Array.from(
+                grid.querySelectorAll<HTMLElement>('.waterfall-item:not(.wf-hidden)')
+            );
+            visibleItems.forEach((item) => {
+                item.style.width = colW + 'px';
+                let col = 0;
+                for (let c = 1; c < cols; c++) {
+                    if (colH[c] < colH[col]) col = c;
+                }
+                item.style.left = col * colW + 'px';
+                item.style.top  = colH[col] + 'px';
+                colH[col] += item.offsetHeight;
+            });
+            grid.style.height = Math.max(...colH) + 'px';
+        }
+
+        function attachWaterfallImageListeners() {
+            const grid = document.getElementById('waterfallGrid');
+            if (!grid) return;
+            grid.querySelectorAll<HTMLImageElement>('img').forEach((img) => {
+                if (!img.complete && !img.dataset.wfL) {
+                    img.dataset.wfL = '1';
+                    img.addEventListener('load',  scheduleWaterfallLayout, { once: true });
+                    img.addEventListener('error', scheduleWaterfallLayout, { once: true });
+                }
+            });
+        }
+
+        let _wfResizeTimer = 0;
+        window.addEventListener('resize', () => {
+            clearTimeout(_wfResizeTimer);
+            _wfResizeTimer = window.setTimeout(scheduleWaterfallLayout, 100);
+        });
+
+        function setWaterfallDoneState(allShown: boolean) {
+            if (waterfallMoreWrap) waterfallMoreWrap.classList.toggle('wf-all-shown', allShown);
+            if (waterfallDoneWrap) waterfallDoneWrap.classList.toggle('wf-all-shown', allShown);
+        }
+
+        function initWaterfallLoadMore() {
+            const items = waterfallPanel?.querySelectorAll<HTMLElement>('.waterfall-item') ?? [];
+            const total = items.length;
+            items.forEach((item, idx) => {
+                item.classList.toggle('wf-hidden', idx >= WF_BATCH);
+            });
+            wfShownCount = Math.min(WF_BATCH, total);
+            setWaterfallDoneState(total <= WF_BATCH);
+            attachWaterfallImageListeners();
+            scheduleWaterfallLayout();
+        }
+
+        function resetWaterfallLoadMore() {
+            initWaterfallLoadMore();
+        }
+
+        waterfallMoreBtn?.addEventListener('click', () => {
+            const items = waterfallPanel?.querySelectorAll<HTMLElement>('.waterfall-item') ?? [];
+            const total = items.length;
+            const newCount = Math.min(wfShownCount + WF_BATCH, total);
+            for (let i = wfShownCount; i < newCount; i++) {
+                items[i]?.classList.remove('wf-hidden');
+            }
+            wfShownCount = newCount;
+            setWaterfallDoneState(wfShownCount >= total);
+            attachWaterfallImageListeners();
+            scheduleWaterfallLayout();
+        });
+
+        const waterfallBackBtn = document.getElementById('waterfallBackBtn');
+        waterfallBackBtn?.addEventListener('click', () => {
+            resetWaterfallLoadMore();
+            waterfallPanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        initWaterfallLoadMore();
+
         const mainCardsPerPage = 32;
         const mobileUnifiedFilters = new Set(['main', 'aplus', 'video', 'brand', 'packaging', 'ces', 'other']);
         let currentFilter = 'waterfall';
@@ -2013,6 +2197,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             if (waterfallPanel) waterfallPanel.classList.toggle('active', isWaterfall);
             if (isWaterfall && workPagination) {
                 workPagination.hidden = true;
+            }
+            if (isWaterfall) {
+                resetWaterfallLoadMore();
             }
         }
 
