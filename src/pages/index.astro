@@ -15,9 +15,11 @@ type MainProjectCard = {
 };
 
 type WaterfallImage = {
+    type: 'image' | 'video';
     src: string;
     alt: string;
     folderLabel: string;
+    mimeType?: string;
 };
 
 type ResponsiveImageData = {
@@ -122,6 +124,14 @@ async function createLocalResponsiveImageData(src: string): Promise<ResponsiveIm
     }
 
     const extension = path.extname(absolutePath).toLowerCase();
+    if (extension === '.png' && Number(metadata.pages || 1) > 1) {
+        return {
+            src: normalizedSrc,
+            width: metadata.width,
+            height: metadata.height,
+        };
+    }
+
     const sharpFormat = getSharpFormat(extension);
 
     if (!sharpFormat || extension === '.gif') {
@@ -341,7 +351,7 @@ async function loadProjectCards(rootPath: string): Promise<MainProjectCard[]> {
 }
 
 async function loadWaterfallImages(rootPath: string): Promise<WaterfallImage[]> {
-    const images: WaterfallImage[] = [];
+    const mediaItems: WaterfallImage[] = [];
 
     async function walkDirectory(currentPath: string, folderTrail: string[] = []) {
         const entries = await fs.readdir(currentPath, { withFileTypes: true });
@@ -354,20 +364,25 @@ async function loadWaterfallImages(rootPath: string): Promise<WaterfallImage[]> 
             }
 
             if (!entry.isFile()) continue;
-            if (!imageExtensions.has(path.extname(entry.name).toLowerCase())) continue;
+            const extension = path.extname(entry.name).toLowerCase();
+            const isImage = imageExtensions.has(extension);
+            const isVideo = videoExtensions.has(extension);
+            if (!isImage && !isVideo) continue;
 
             const folderLabel = folderTrail.length ? folderTrail.join(' / ') : path.basename(rootPath);
-            images.push({
+            mediaItems.push({
+                type: isVideo ? 'video' : 'image',
                 src: toPublicUrl(entryPath),
                 alt: `${folderLabel} - ${entry.name}`,
                 folderLabel,
+                mimeType: isVideo ? getVideoMimeType(entry.name) : undefined,
             });
         }
     }
 
     await walkDirectory(rootPath);
 
-    return images.sort((left, right) => left.alt.localeCompare(right.alt, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' }));
+    return mediaItems.sort((left, right) => left.alt.localeCompare(right.alt, 'zh-Hans-CN', { numeric: true, sensitivity: 'base' }));
 }
 
 const mainProjectCards = await loadProjectCards(mainProjectsRoot);
@@ -378,6 +393,9 @@ const packagingProjectCards = await loadProjectCards(packagingProjectsRoot);
 const cesProjectCards = await loadProjectCards(cesProjectsRoot);
 const otherProjectCards = await loadProjectCards(otherProjectsRoot);
 const waterfallImages = await loadWaterfallImages(waterfallRoot);
+const h5cDrone2RankImages = mainProjectCards.find((card) => card.folderName === 'H5C Drone 2')?.images ?? [];
+const a15hDroneRankImages = mainProjectCards.find((card) => card.folderName === 'A15H Drone')?.images ?? [];
+const h823hBlueRankImages = mainProjectCards.find((card) => card.folderName === 'H823H Drone（blue）')?.images ?? [];
 
 const allProjectCards = [
     ...mainProjectCards,
@@ -391,6 +409,7 @@ const allProjectCards = [
 
 const responsiveSourceUrls = new Set<string>([
     '/1shouye/1ya.png',
+    '/1shouye/ms.png',
     '/1shouye/methodology-reference.png',
     '/tex/toux.jpg',
     ...waterfallImages.map((image) => image.src),
@@ -703,7 +722,15 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             object-fit: cover;
             transition: transform 0.35s ease;
         }
+        .waterfall-block video {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+            background: #111;
+            transition: transform 0.35s ease;
+        }
         .waterfall-block:hover img { transform: scale(1.02); }
+        .waterfall-block:hover video { transform: scale(1.02); }
         
         .massive-grid-wrap { position: relative; }
         .massive-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; align-items: start; }
@@ -1081,29 +1108,35 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         /* === 5. 亚马逊百强 === */
         #amazon-rank { background: #fff; }
         .chart-container { 
-            background: #fff; padding: 30px; border-radius: 15px; 
+            background: #fff; padding: 20px; border-radius: 15px; 
             box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 50px; 
         }
         .chart-preview {
-            height: 300px; background: linear-gradient(135deg, #fff7ed 0%, #ffe7cc 100%);
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1554 / 730;
+            background: linear-gradient(135deg, #fff7ed 0%, #ffe7cc 100%);
             border-radius: 10px; display: flex; align-items: center; justify-content: center;
             border: 1px dashed #ffbb77; color: #8a4b00; cursor: pointer; position: relative; overflow: hidden;
-            font-weight: 600; text-align: center; padding: 24px;
+            font-weight: 600; text-align: center; padding: 0;
         }
-        .chart-preview::before {
-            content: '点击放大 BSR 趋势图'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 153, 0, 0.08); font-size: 1.05rem;
+        .chart-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         .chart-preview:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
         .rank-item { 
-            display: flex; justify-content: space-between; padding: 18px 20px; 
+            display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; padding: 18px 20px; 
             border-bottom: 1px solid #eee; font-size: 1rem; transition: all 0.3s ease; 
-            border-radius: 8px; cursor: pointer; }
+            border-radius: 8px; cursor: pointer; align-items: start; }
         .rank-item:hover { background-color: #f9f9f9; transform: translateX(5px); box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
         .rank-item:last-child { border-bottom: none; }
         .rank-item.expanded { background: #fff7ed; border-color: #ffcc99; }
+        .rank-item > div:first-child { min-width: 0; }
         .rank-num { font-weight: 800; color: #e74c3c; }
-        .rank-gallery { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 12px; padding: 0 4px 4px; }
+        .rank-gallery { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 0; padding: 0 4px 4px; grid-column: 1 / -1; }
         .rank-item.expanded .rank-gallery { display: grid; }
         .rank-gallery :global(img) { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid #f0f0f0; }
         .rank-gallery :global(.gallery-more) { display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #666; font-size: 0.9rem; border-radius: 8px; border: 1px dashed #ddd; }
@@ -1278,7 +1311,31 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             .hero-title .highlight { font-size: 1.05rem; }
             .hero-stats .stat-item h3 { font-size: 1.8rem; }
             .ai-stats { grid-template-columns: 1fr; gap: 18px; }
-            .chart-preview { height: 220px; padding: 16px; }
+            .tech-stack { margin-top: 34px; }
+            .tech-stack p,
+            .software-stack p {
+                font-size: 0.72rem;
+                margin-bottom: 10px;
+                letter-spacing: 0.06em;
+            }
+            .tech-stack span,
+            .software-stack span {
+                font-size: 0.7rem;
+                padding: 5px 12px;
+                margin: 0 6px 8px;
+                border-radius: 18px;
+                border-width: 1px;
+                box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            }
+            .software-stack {
+                padding: 16px 12px 12px;
+            }
+            .chart-container { padding: 10px; }
+            .chart-preview {
+                width: calc(100% + 8px);
+                margin-left: -4px;
+                padding: 0;
+            }
             .methodology-wrapper {
                 padding: 8px;
                 gap: 10px;
@@ -1419,7 +1476,13 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 {waterfallImages.map((image) => (
                     <figure class="waterfall-item" data-folder={image.folderLabel}>
                         <div class="waterfall-block">
-                            <img {...getCatalogImageAttrs(image.src, imageSizes.waterfall)} alt={image.alt} />
+                            {image.type === 'video' ? (
+                                <video class="waterfall-preview-video" autoplay muted loop playsinline preload="metadata" aria-label={image.alt}>
+                                    <source src={image.src} type={image.mimeType || 'video/mp4'} />
+                                </video>
+                            ) : (
+                                <img {...getCatalogImageAttrs(image.src, imageSizes.waterfall)} alt={image.alt} />
+                            )}
                         </div>
                     </figure>
                 ))}
@@ -1551,20 +1614,15 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             <h2 class="section-title">亚马逊百强<span class="highlight">战绩墙</span></h2>
             <p class="section-subtitle">由本人独立完成视觉设计的超<strong style="color: #e74c3c;">10款产品</strong>，成功跻身 Best Sellers 榜单。<span style="color: #ff9900; margin-left: 6px;">（同一时期）</span></p>
             <div class="chart-container">
-                <div class="chart-preview" id="chartPreview">BSR 排名趋势图 / 数据看板预览</div>
+                <div class="chart-preview" id="chartPreview" data-image="/1shouye/ms.png">
+                    <img {...getCatalogImageAttrs('/1shouye/ms.png', imageSizes.methodology)} alt="亚马逊百强战绩墙数据看板" />
+                </div>
                 <div style="margin-top: 30px;">
                     <h4 style="margin-bottom: 15px; color: #333; border-left: 4px solid #ff9900; padding-left: 10px;">核心爆款案例</h4>
                     <ul style="list-style: none; padding-left: 0;">
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能扫地机 S31</strong> - Home & Kitchen</div><span class="rank-num">#12</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>降噪耳机 X5</strong> - Electronics</div><span class="rank-num">#8</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>便携储能电源</strong> - Tools & Home</div><span class="rank-num">#25</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>电动滑板车 Pro</strong> - Sports</div><span class="rank-num">#45</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能手环 Pro</strong> - Wearables</div><span class="rank-num">#18</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>便携投影仪</strong> - Home Office</div><span class="rank-num">#22</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能音箱</strong> - Electronics</div><span class="rank-num">#16</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>无线充电器</strong> - Accessories</div><span class="rank-num">#30</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能吸尘器</strong> - Home Appliances</div><span class="rank-num">#14</span><div class="rank-gallery"></div></li>
-                        <li class="rank-item" data-images='["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&w=600&q=80","https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]'><div><strong>智能门锁</strong> - Smart Home</div><span class="rank-num">#21</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images={JSON.stringify(h5cDrone2RankImages)}><div><strong>无人机 S5C</strong> - Multirotors</div><span class="rank-num">#1</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images={JSON.stringify(a15hDroneRankImages)}><div><strong>无人机 A15</strong> - Multirotors</div><span class="rank-num">#6</span><div class="rank-gallery"></div></li>
+                        <li class="rank-item" data-images={JSON.stringify(h823hBlueRankImages)}><div><strong>无人机 H823H</strong> - Multirotors</div><span class="rank-num">#8</span><div class="rank-gallery"></div></li>
                     </ul>
                 </div>
             </div>
@@ -2281,16 +2339,18 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             });
         });
 
-        document.querySelectorAll<HTMLVideoElement>('.project-preview-video').forEach(video => {
+        document.querySelectorAll<HTMLVideoElement>('.project-preview-video, .waterfall-preview-video').forEach(video => {
             const thumb = video.closest<HTMLElement>('.project-thumb');
-            if (!thumb) return;
+            const waterfallBlock = video.closest<HTMLElement>('.waterfall-block');
+            const mediaWrap = thumb || waterfallBlock;
+            if (!mediaWrap) return;
 
             const showFallback = () => {
-                thumb.classList.add('video-error');
+                mediaWrap.classList.add('video-error');
             };
 
             const hideFallback = () => {
-                thumb.classList.remove('video-error');
+                mediaWrap.classList.remove('video-error');
             };
 
             const tryPlayPreview = () => {
@@ -2364,7 +2424,13 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     const images = JSON.parse(item.dataset.images || '[]') as string[];
                     const gallery = item.querySelector<HTMLElement>('.rank-gallery');
                     if (gallery && images.length) {
-                        const displayImages = Array.from({ length: 25 }, (_, index: number) => `${images[index % images.length]}&sig=${index}`);
+                        const displayImages = Array.from({ length: 25 }, (_, index: number) => {
+                            const src = images[index % images.length];
+                            if (/^https?:\/\/images\.unsplash\.com\//i.test(src)) {
+                                return `${src}${src.includes('?') ? '&' : '?'}sig=${index}`;
+                            }
+                            return src;
+                        });
                         gallery.innerHTML = displayImages.slice(0, 10).map((src, index: number) => {
                             if (index === 9) {
                                 return `<div class="gallery-more">+${displayImages.length - 9} 张</div>`;
@@ -2384,9 +2450,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
 
         if (chartPreview) {
             chartPreview.addEventListener('click', () => {
-                openLightboxImages([
-                    'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=80'
-                ], 0);
+                const imageSrc = chartPreview.getAttribute('data-image') || '/1shouye/ms.png';
+                openLightboxImages([imageSrc], 0);
             });
         }
 
