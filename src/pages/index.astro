@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
+import { inject } from '@vercel/analytics';
 
 type MainProjectCard = {
     folderName: string;
@@ -1460,6 +1461,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
     </style>
+    <script>
+        import { inject } from '@vercel/analytics';
+        inject();
+    </script>
 </head>
 <body>
 
