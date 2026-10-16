@@ -2,7 +2,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import sharp from 'sharp';
-import { inject } from '@vercel/analytics';
 
 type MainProjectCard = {
     folderName: string;
@@ -1461,10 +1460,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
     </style>
-    <script>
-        import { inject } from '@vercel/analytics';
-        inject();
-    </script>
 </head>
 <body>
 
@@ -1819,12 +1814,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         const runtimeResponsiveImageCatalog = runtimeResponsiveImageCatalogElement instanceof HTMLElement && runtimeResponsiveImageCatalogElement.dataset.json
             ? JSON.parse(decodeURIComponent(runtimeResponsiveImageCatalogElement.dataset.json))
             : {};
-
         function getRuntimeResponsiveImageData(src: string) {
             if (runtimeResponsiveImageCatalog[src]) {
                 return runtimeResponsiveImageCatalog[src];
             }
-
             if (/^https?:\/\/images\.unsplash\.com\//i.test(src)) {
                 const url = new URL(src);
                 const originalWidth = Number(url.searchParams.get('w') || '1600');
@@ -1839,7 +1832,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     width: originalWidth,
                 };
             }
-
             if (/^https?:\/\/placehold\.co\//i.test(src)) {
                 const url = new URL(src);
                 const match = url.pathname.match(/\/(\d+)x(\d+)(?=\/|$)/i);
@@ -1858,10 +1850,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     };
                 }
             }
-
             return { src };
         }
-
         function getResponsiveImageTagAttributes(src: string, sizes = '100vw') {
             const data = getRuntimeResponsiveImageData(src);
             const attrs = [
@@ -1870,26 +1860,20 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 `loading="lazy"`,
                 `decoding="async"`,
             ];
-
             if (data.srcset) attrs.push(`srcset="${data.srcset}"`);
             if (data.width) attrs.push(`width="${data.width}"`);
             if (data.height) attrs.push(`height="${data.height}"`);
-
             return attrs.join(' ');
         }
-
         // === 导航条滚动隐藏/显示 ===
         const navElement = document.querySelector('nav');
         let lastScrollY = 0;
         let isNavHidden = false;
         let scrollTimeout: ReturnType<typeof setTimeout> | null = null;
-
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
             const isScrollingDown = currentScrollY > lastScrollY;
-
             if (scrollTimeout) clearTimeout(scrollTimeout);
-
             if (isScrollingDown && currentScrollY > 100) {
                 // 向下滚动且滚动距离超过100px时，隐藏导航条
                 if (!isNavHidden && navElement) {
@@ -1903,7 +1887,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     isNavHidden = false;
                 }
             }
-
             // 停止滚动后延迟显示
             scrollTimeout = setTimeout(() => {
                 if (navElement && isNavHidden) {
@@ -1911,10 +1894,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     isNavHidden = false;
                 }
             }, 1200);
-
             lastScrollY = currentScrollY;
         }, { passive: true });
-
         // === 平滑滚动 ===
         document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1926,7 +1907,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         });
-
         // === 作品过滤与瀑布图集 ===
         const workGridWrap = document.getElementById('workGridWrap');
         const worksSection = document.getElementById('works');
@@ -1942,7 +1922,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         const waterfallDoneWrap = document.getElementById('waterfallDoneWrap');
         const WF_BATCH = 39;
         let wfShownCount = WF_BATCH;
-
         // === JS Masonry 布局 ===
         function getWaterfallCols(): number {
             const w = window.innerWidth;
@@ -1950,7 +1929,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             if (w <= 768) return 4;
             return 5;
         }
-
         let _wfRaf = 0;
         function scheduleWaterfallLayout() {
             if (_wfRaf) cancelAnimationFrame(_wfRaf);
@@ -1959,7 +1937,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 layoutWaterfall();
             });
         }
-
         function layoutWaterfall() {
             const grid = document.getElementById('waterfallGrid') as HTMLElement | null;
             if (!grid) return;
@@ -1983,7 +1960,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             });
             grid.style.height = Math.max(...colH) + 'px';
         }
-
         function attachWaterfallImageListeners() {
             const grid = document.getElementById('waterfallGrid');
             if (!grid) return;
@@ -1995,18 +1971,15 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         }
-
         let _wfResizeTimer = 0;
         window.addEventListener('resize', () => {
             clearTimeout(_wfResizeTimer);
             _wfResizeTimer = window.setTimeout(scheduleWaterfallLayout, 100);
         });
-
         function setWaterfallDoneState(allShown: boolean) {
             if (waterfallMoreWrap) waterfallMoreWrap.classList.toggle('wf-all-shown', allShown);
             if (waterfallDoneWrap) waterfallDoneWrap.classList.toggle('wf-all-shown', allShown);
         }
-
         function initWaterfallLoadMore() {
             const items = waterfallPanel?.querySelectorAll<HTMLElement>('.waterfall-item') ?? [];
             const total = items.length;
@@ -2018,11 +1991,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             attachWaterfallImageListeners();
             scheduleWaterfallLayout();
         }
-
         function resetWaterfallLoadMore() {
             initWaterfallLoadMore();
         }
-
         waterfallMoreBtn?.addEventListener('click', () => {
             const items = waterfallPanel?.querySelectorAll<HTMLElement>('.waterfall-item') ?? [];
             const total = items.length;
@@ -2035,15 +2006,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             attachWaterfallImageListeners();
             scheduleWaterfallLayout();
         });
-
         const waterfallBackBtn = document.getElementById('waterfallBackBtn');
         waterfallBackBtn?.addEventListener('click', () => {
             resetWaterfallLoadMore();
             waterfallPanel?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
-
         initWaterfallLoadMore();
-
         const mainCardsPerPage = 32;
         const mobileUnifiedFilters = new Set(['main', 'aplus', 'video', 'brand', 'packaging', 'ces', 'other']);
         let currentFilter = 'waterfall';
@@ -2054,15 +2022,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         const worksSearchClear = document.getElementById('worksSearchClear');
         const worksSearchStat = document.getElementById('worksSearchStat');
         const worksNoResults = document.getElementById('worksNoResults');
-
         function isDesktopViewport() {
             return window.matchMedia('(min-width: 769px)').matches;
         }
-
         function isMobileViewport() {
             return window.matchMedia('(max-width: 768px)').matches;
         }
-
         function normalizeSearchText(value: string) {
             return value
                 .trim()
@@ -2070,7 +2035,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 .toLowerCase()
                 .replace(/[\s\p{P}\p{S}]+/gu, '');
         }
-
         function escapeHtml(value: string) {
             return value
                 .replaceAll('&', '&amp;')
@@ -2079,7 +2043,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 .replaceAll('"', '&quot;')
                 .replaceAll("'", '&#39;');
         }
-
         function getCardSearchText(card: HTMLElement) {
             if (!card.dataset.searchText) {
                 const title = card.querySelector('h4')?.textContent || '';
@@ -2087,49 +2050,39 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 const altText = Array.from(card.querySelectorAll('img')).map((img) => img.alt || '').join(' ');
                 card.dataset.searchText = normalizeSearchText([title, subtitle, altText, card.dataset.type || '', card.dataset.source || ''].join(' '));
             }
-
             return card.dataset.searchText || '';
         }
-
         function setCardTitleHighlight(card: HTMLElement, query: string) {
             const title = card.querySelector('h4');
             if (!title) return;
-
             if (!title.dataset.originalText) {
                 title.dataset.originalText = title.textContent || '';
             }
-
             const originalText = title.dataset.originalText || '';
             if (!query) {
                 title.innerHTML = escapeHtml(originalText);
                 return;
             }
-
             const lowerOriginal = originalText.toLowerCase();
             const index = lowerOriginal.indexOf(query);
             if (index < 0) {
                 title.innerHTML = escapeHtml(originalText);
                 return;
             }
-
             const before = originalText.slice(0, index);
             const match = originalText.slice(index, index + query.length);
             const after = originalText.slice(index + query.length);
             title.innerHTML = `${escapeHtml(before)}<span class="search-match">${escapeHtml(match)}</span>${escapeHtml(after)}`;
         }
-
         function toggleMainMobileScrollLayout() {
             if (!(workGrid instanceof HTMLElement)) return;
             const shouldEnable = mobileUnifiedFilters.has(currentFilter) && isMobileViewport();
             workGrid.classList.toggle('mobile-main-scroll', shouldEnable);
         }
-
         function updateMainPaginationUI(totalPages: number) {
             if (!workPagination || !workPageNumbers || !workPageVisual) return;
-
             workPageNumbers.innerHTML = '';
             workPageVisual.innerHTML = '';
-
             for (let page = 1; page <= totalPages; page++) {
                 const numberBtn = document.createElement('button');
                 numberBtn.type = 'button';
@@ -2138,7 +2091,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 numberBtn.setAttribute('aria-label', `跳转到第 ${page} 页`);
                 numberBtn.addEventListener('click', () => renderMainPage(page, true));
                 workPageNumbers.appendChild(numberBtn);
-
                 const visualBtn = document.createElement('button');
                 visualBtn.type = 'button';
                 visualBtn.className = `page-visual-dot${page === currentMainPage ? ' active' : ''}`;
@@ -2146,7 +2098,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 visualBtn.addEventListener('click', () => renderMainPage(page, true));
                 workPageVisual.appendChild(visualBtn);
             }
-
             if (paginationPrevBtn) {
                 paginationPrevBtn.disabled = currentMainPage <= 1;
             }
@@ -2154,13 +2105,11 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 paginationNextBtn.disabled = currentMainPage >= totalPages;
             }
         }
-
         function renderMainPage(targetPage: number, scrollToTop = false) {
             if (!visibleMainCards.length) {
                 if (workPagination) workPagination.hidden = true;
                 return;
             }
-
             if (!isDesktopViewport() || currentFilter !== 'main') {
                 visibleMainCards.forEach((card) => {
                     card.style.removeProperty('display');
@@ -2168,12 +2117,10 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 if (workPagination) workPagination.hidden = true;
                 return;
             }
-
             const totalPages = Math.max(1, Math.ceil(visibleMainCards.length / mainCardsPerPage));
             currentMainPage = Math.min(Math.max(targetPage, 1), totalPages);
             const start = (currentMainPage - 1) * mainCardsPerPage;
             const end = start + mainCardsPerPage;
-
             visibleMainCards.forEach((card, index) => {
                 if (index >= start && index < end) {
                     card.style.removeProperty('display');
@@ -2181,23 +2128,19 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     card.style.display = 'none';
                 }
             });
-
             if (workPagination) {
                 workPagination.hidden = totalPages <= 1;
             }
             updateMainPaginationUI(totalPages);
-
             if (scrollToTop) {
                 worksSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-
         function refreshMainPagination(cards: HTMLElement[]) {
             visibleMainCards = cards;
             currentMainPage = 1;
             renderMainPage(currentMainPage, false);
         }
-
         function setWaterfallMode(isWaterfall: boolean) {
             if (workGridWrap) workGridWrap.style.display = isWaterfall ? 'none' : '';
             if (waterfallPanel) waterfallPanel.classList.toggle('active', isWaterfall);
@@ -2208,7 +2151,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 resetWaterfallLoadMore();
             }
         }
-
         function updateWorksSearchStatus(visibleCount: number, totalCount: number, isWaterfall = false) {
             if (worksSearchStat) {
                 if (isWaterfall) {
@@ -2219,39 +2161,31 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     worksSearchStat.textContent = `找到 ${visibleCount}/${totalCount} 个结果`;
                 }
             }
-
             if (worksNoResults) {
                 worksNoResults.style.display = !currentSearchQuery || visibleCount > 0 ? 'none' : 'block';
             }
         }
-
         function applyWorksFilterState() {
             const cards = document.querySelectorAll<HTMLElement>('.project-card');
             const normalizedQuery = normalizeSearchText(currentSearchQuery);
             const filterType = normalizedQuery ? 'all' : currentFilter;
             const isWaterfall = filterType === 'waterfall' && !normalizedQuery;
-
             setWaterfallMode(isWaterfall);
-
             if (isWaterfall) {
                 cards.forEach((card) => setCardTitleHighlight(card, ''));
                 updateWorksSearchStatus(0, 0, true);
                 return;
             }
-
             const visibleCards: HTMLElement[] = [];
             const visibleDirectoryMainCards: HTMLElement[] = [];
-
             cards.forEach((card) => {
                 const categoryMatches = filterType === 'all'
                     ? true
                     : card.dataset.type === filterType;
                 const queryMatches = !normalizedQuery || getCardSearchText(card).includes(normalizedQuery);
                 const shouldShow = categoryMatches && queryMatches;
-
                 card.style.display = shouldShow ? '' : 'none';
                 setCardTitleHighlight(card, shouldShow ? normalizedQuery : '');
-
                 if (shouldShow) {
                     visibleCards.push(card);
                     if (card.dataset.type === 'main' && card.dataset.source === 'directory') {
@@ -2259,46 +2193,36 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     }
                 }
             });
-
             if (filterType === 'main') {
                 refreshMainPagination(visibleDirectoryMainCards);
             } else {
                 visibleMainCards = [];
                 if (workPagination) workPagination.hidden = true;
             }
-
             updateWorksSearchStatus(visibleCards.length, cards.length);
             toggleMainMobileScrollLayout();
         }
-
         function filterWorks(type: string, button: HTMLElement | null) {
             const buttons = document.querySelectorAll<HTMLElement>('.filter-btn');
             currentFilter = type;
-
             buttons.forEach(btn => btn.classList.remove('active'));
             if (button) {
                 button.classList.add('active');
             }
-
             applyWorksFilterState();
         }
-
         paginationPrevBtn?.addEventListener('click', () => {
             renderMainPage(currentMainPage - 1, true);
         });
-
         paginationNextBtn?.addEventListener('click', () => {
             renderMainPage(currentMainPage + 1, true);
         });
-
         window.addEventListener('resize', () => {
             toggleMainMobileScrollLayout();
-
             if (currentFilter === 'main' || currentSearchQuery) {
                 applyWorksFilterState();
             }
         });
-
         document.querySelectorAll<HTMLElement>('.filter-btn').forEach(button => {
             button.addEventListener('click', () => {
                 const hasActiveSearchQuery = normalizeSearchText(currentSearchQuery).length > 0;
@@ -2306,75 +2230,59 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     worksSearchInput.value = '';
                     currentSearchQuery = '';
                 }
-
                 filterWorks(button.dataset.filter || 'all', button);
                 // Add glow effect
                 button.classList.add('glow-active');
                 setTimeout(() => button.classList.remove('glow-active'), 800);
             });
         });
-
         function handleWorksSearchUpdate() {
             if (!worksSearchInput) return;
-
             currentSearchQuery = worksSearchInput.value;
-
             applyWorksFilterState();
         }
-
         worksSearchInput?.addEventListener('input', handleWorksSearchUpdate);
         worksSearchInput?.addEventListener('keyup', handleWorksSearchUpdate);
         worksSearchInput?.addEventListener('search', handleWorksSearchUpdate);
         worksSearchInput?.addEventListener('change', handleWorksSearchUpdate);
-
         worksSearchClear?.addEventListener('click', () => {
             if (worksSearchInput) {
                 worksSearchInput.value = '';
                 worksSearchInput.focus();
             }
             currentSearchQuery = '';
-
             if (currentFilter === 'waterfall') {
                 const waterfallButton = document.querySelector<HTMLElement>('.filter-btn[data-filter="waterfall"]');
                 filterWorks('waterfall', waterfallButton);
                 return;
             }
-
             applyWorksFilterState();
         });
-
         document.querySelectorAll<HTMLElement>('.works-hotkey').forEach((button) => {
             button.addEventListener('click', () => {
                 const keyword = button.dataset.searchKeyword || '';
                 if (!worksSearchInput) return;
-
                 worksSearchInput.value = keyword;
                 currentSearchQuery = keyword;
-
                 applyWorksFilterState();
             });
         });
-
         document.addEventListener('keydown', (event) => {
             const isSearchShortcut = event.key === '/' || ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k');
-
             if (isSearchShortcut && document.activeElement !== worksSearchInput) {
                 event.preventDefault();
                 worksSearchInput?.focus();
                 worksSearchInput?.select();
                 return;
             }
-
             if (event.key === 'Escape' && document.activeElement === worksSearchInput) {
                 worksSearchClear?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
             }
         });
-
         const defaultFilterBtn = document.querySelector<HTMLElement>('.filter-btn.active');
         if (defaultFilterBtn) {
             filterWorks(defaultFilterBtn.dataset.filter || 'all', defaultFilterBtn);
         }
-
         const chartPreview = document.getElementById('chartPreview');
         const overlay = document.getElementById('lightboxOverlay');
         const lightboxGallery = document.getElementById('lightboxGallery');
@@ -2387,30 +2295,24 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             type: 'image' | 'video';
             src: string;
         };
-
         let currentLightboxMedia: LightboxMediaItem[] = [];
         let currentLightboxIndex = 0;
         let previousBodyOverflow = '';
-
         function getMediaMimeType(src: string) {
             const cleanSrc = src.split('?')[0].toLowerCase();
             if (cleanSrc.endsWith('.webm')) return 'video/webm';
             if (cleanSrc.endsWith('.mov')) return 'video/quicktime';
             return 'video/mp4';
         }
-
         function syncLightboxVideoPlayback() {
             if (!lightboxGallery || !currentLightboxMedia.length) return;
-
             const mediaNodes = lightboxGallery.querySelectorAll<HTMLElement>('[data-lightbox-item]');
             mediaNodes.forEach((node, nodeIndex) => {
                 if (!(node instanceof HTMLVideoElement)) return;
-
                 if (nodeIndex !== currentLightboxIndex) {
                     node.pause();
                     return;
                 }
-
                 node.defaultMuted = true;
                 node.muted = true;
                 node.playsInline = true;
@@ -2420,7 +2322,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 });
             });
         }
-
         function openLightbox(media: LightboxMediaItem[], index = 0) {
             if (!overlay || !lightboxGallery || !lightboxCaption) return;
             currentLightboxMedia = media;
@@ -2448,11 +2349,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 syncLightboxVideoPlayback();
             });
         }
-
         function openLightboxImages(images: string[], index = 0) {
             openLightbox(images.map((src) => ({ type: 'image', src })), index);
         }
-
         function closeLightbox() {
             if (overlay) overlay.classList.remove('active');
             lightboxGallery?.querySelectorAll('video').forEach((video) => {
@@ -2462,7 +2361,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             });
             document.body.style.overflow = previousBodyOverflow;
         }
-
         function openMethodologyLightbox() {
             const imageSrc = methodChart?.getAttribute('data-image') || '/1shouye/2suo.png';
             if (
@@ -2476,7 +2374,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             }
             openLightboxImages([imageSrc], 0);
         }
-
         function showLightboxImage(index: number) {
             if (!lightboxGallery || !lightboxCaption || !currentLightboxMedia.length) return;
             currentLightboxIndex = (index + currentLightboxMedia.length) % currentLightboxMedia.length;
@@ -2493,7 +2390,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             }
             syncLightboxVideoPlayback();
         }
-
         function getProjectLightboxMedia(card: HTMLElement): LightboxMediaItem[] {
             const baseImages = [
                 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
@@ -2507,7 +2403,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             if (isDirectoryCard && !customImages.length && !customVideos.length) {
                 return [];
             }
-
             const media: LightboxMediaItem[] = [];
             if (customVideos.length) {
                 media.push(...customVideos.map((src) => ({ type: 'video' as const, src })));
@@ -2518,11 +2413,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             if (media.length) {
                 return media;
             }
-
             const sourceImages = customImages.length ? customImages : baseImages;
             return Array.from({ length: sourceImages.length }, (_, index) => ({ type: 'image' as const, src: sourceImages[index] }));
         }
-
         document.querySelectorAll<HTMLElement>('.project-card').forEach(card => {
             card.addEventListener('click', () => {
                 const media = getProjectLightboxMedia(card);
@@ -2531,21 +2424,17 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         });
-
         document.querySelectorAll<HTMLVideoElement>('.project-preview-video, .waterfall-preview-video').forEach(video => {
             const thumb = video.closest<HTMLElement>('.project-thumb');
             const waterfallBlock = video.closest<HTMLElement>('.waterfall-block');
             const mediaWrap = thumb || waterfallBlock;
             if (!mediaWrap) return;
-
             const showFallback = () => {
                 mediaWrap.classList.add('video-error');
             };
-
             const hideFallback = () => {
                 mediaWrap.classList.remove('video-error');
             };
-
             const tryPlayPreview = () => {
                 video.play().then(() => {
                 }).catch(() => {
@@ -2553,7 +2442,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     showFallback();
                 });
             };
-
             video.defaultMuted = true;
             video.muted = true;
             video.autoplay = true;
@@ -2563,14 +2451,11 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             video.setAttribute('autoplay', '');
             video.setAttribute('playsinline', '');
             video.setAttribute('webkit-playsinline', 'true');
-
             // Start from image fallback and only hide it after video is really playing.
             showFallback();
-
             if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
                 tryPlayPreview();
             }
-
             video.addEventListener('loadeddata', tryPlayPreview);
             video.addEventListener('loadedmetadata', tryPlayPreview);
             video.addEventListener('canplay', () => {
@@ -2588,21 +2473,17 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     showFallback();
                 }
             });
-
             const visibilityObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry) => {
                     if (!entry.isIntersecting) {
                         video.pause();
                         return;
                     }
-
                     tryPlayPreview();
                 });
             }, { threshold: 0.35 });
-
             visibilityObserver.observe(video);
         });
-
         document.querySelectorAll<HTMLElement>('.rank-item').forEach(item => {
             item.addEventListener('click', () => {
                 const isExpanded = item.classList.contains('expanded');
@@ -2611,7 +2492,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                     const gallery = otherItem.querySelector<HTMLElement>('.rank-gallery');
                     if (gallery) gallery.innerHTML = '';
                 });
-
                 if (!isExpanded) {
                     item.classList.add('expanded');
                     const images = JSON.parse(item.dataset.images || '[]') as string[];
@@ -2640,23 +2520,19 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         });
-
         if (chartPreview) {
             chartPreview.addEventListener('click', () => {
                 const imageSrc = chartPreview.getAttribute('data-image') || '/1shouye/ms.png';
                 openLightboxImages([imageSrc], 0);
             });
         }
-
         methodChart?.addEventListener('click', openMethodologyLightbox);
-
         lightboxGallery?.addEventListener('click', (event) => {
             const target = event.target;
             if (target instanceof HTMLImageElement && currentLightboxMedia.length === 1) {
                 closeLightbox();
             }
         });
-
         if (overlay) {
             overlay.addEventListener('click', (event) => {
                 if (event.target === overlay) closeLightbox();
@@ -2671,7 +2547,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             if (event.key === 'ArrowRight') showLightboxImage(currentLightboxIndex + 1);
             if (event.key === 'ArrowLeft') showLightboxImage(currentLightboxIndex - 1);
         });
-
         // === 原生 JS 数字滚动动画 ===
         function animateCountUp(el: HTMLElement) {
             const target = parseInt(el.dataset.target || '0');
@@ -2679,7 +2554,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             const duration = 2000; // 2秒动画
             const step = target / (duration / 16); // 每帧增加的数值
             let current = 0;
-
             const timer = setInterval(() => {
                 current += step;
                 if (current >= target) {
@@ -2690,7 +2564,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             }, 16);
         }
-
         // === 监听滚动触发数字动画 ===
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -2700,15 +2573,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         }, { threshold: 0.5 });
-
         document.querySelectorAll('.count-up').forEach(el => observer.observe(el));
-
         // === 编辑模式开关 ===
         let clickCount = 0;
         let clickTimer: ReturnType<typeof setTimeout> | null = null;
         const logo = document.getElementById('logo-trigger');
         const indicator = document.getElementById('edit-mode-indicator');
-
         if (logo) {
             logo.addEventListener('click', () => {
                 clickCount++;
@@ -2719,10 +2589,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 } else if (clickCount === 3) {
                     if (clickTimer) clearTimeout(clickTimer);
                     clickCount = 0;
-                    
                     const isEditable = document.body.contentEditable === 'true';
                     document.body.contentEditable = isEditable ? 'false' : 'true';
-                    
                     if (indicator) {
                         indicator.style.display = isEditable ? 'none' : 'block';
                         setTimeout(() => {
@@ -2732,7 +2600,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 }
             });
         }
-
         // === 移动端导航 开关 ===
         const mobileToggle = document.getElementById('mobile-nav-toggle');
         const mobileNav = document.getElementById('mobileNav');
@@ -2769,7 +2636,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             // Add glow effect
             (e.target as HTMLElement).classList.add('glow-active');
             setTimeout(() => (e.target as HTMLElement).classList.remove('glow-active'), 800);
-            
             const text = '312675265@qq.com';
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => alert('Email 已复制：' + text));
@@ -2783,13 +2649,11 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 alert('Email 已复制：' + text);
             }
         });
-
         copyWeChatBtn?.addEventListener('click', (e) => {
             e.preventDefault();
             // Add glow effect
             (e.target as HTMLElement).classList.add('glow-active');
             setTimeout(() => (e.target as HTMLElement).classList.remove('glow-active'), 800);
-            
             const text = 'YIYUANYUYU';
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => alert('WeChat 已复制：' + text));
@@ -2797,7 +2661,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 alert('请手动复制：' + text);
             }
         });
-
         // Add glow effect to all .btn buttons
         document.querySelectorAll<HTMLElement>('.btn').forEach(button => {
             button.addEventListener('click', (e) => {
@@ -2805,13 +2668,11 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 setTimeout(() => button.classList.remove('glow-active'), 800);
             });
         });
-
         // Add glow effect to other buttons on interaction
         document.addEventListener('click', (e) => {
             const target = (e.target as HTMLElement).closest('a, button');
             if (!target) return;
             if (target.classList.contains('glow-active')) return;
-            
             // Only apply to specific button classes
             if (!target.classList.contains('filter-btn') && 
                 !target.id?.includes('copy') && 
@@ -2819,10 +2680,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 // Add glow to any other interactive elements if needed
             }
         }, true);
-
         // Media protection: reduce direct save/download entry points on both mobile and desktop.
         document.body.classList.add('media-protect');
-
         document.querySelectorAll<HTMLImageElement | HTMLVideoElement>('img, video').forEach((mediaEl) => {
             mediaEl.setAttribute('draggable', 'false');
             if (mediaEl instanceof HTMLVideoElement) {
@@ -2832,7 +2691,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 mediaEl.disablePictureInPicture = true;
             }
         });
-
         document.addEventListener('contextmenu', (event) => {
             const target = event.target as HTMLElement | null;
             if (!target) return;
@@ -2841,7 +2699,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 event.preventDefault();
             }
         });
-
         document.addEventListener('dragstart', (event) => {
             const target = event.target as HTMLElement | null;
             if (!target) return;
@@ -2849,7 +2706,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 event.preventDefault();
             }
         });
-
         document.addEventListener('selectstart', (event) => {
             const target = event.target as HTMLElement | null;
             if (!target) return;
@@ -2857,7 +2713,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 event.preventDefault();
             }
         });
-
         let bounceLocked = false;
         let lastBounceAt = 0;
         let touchStartY = 0;
@@ -2865,43 +2720,34 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         let touchStartAtTop = false;
         let touchStartAtBottom = false;
         let touchBounceTriggered = false;
-
         function canUseGlobalEdgeBounce(target: EventTarget | null) {
             if (!(target instanceof Element)) return true;
             if (target.closest('.lightbox-scroll-area, .mobile-nav.open')) return false;
-
             let current: Element | null = target;
             while (current && current !== document.body) {
                 const style = window.getComputedStyle(current);
                 const overflowY = style.overflowY;
                 const isScrollableY = (overflowY === 'auto' || overflowY === 'scroll')
                     && (current as HTMLElement).scrollHeight > (current as HTMLElement).clientHeight;
-
                 if (isScrollableY) {
                     return false;
                 }
-
                 current = current.parentElement;
             }
-
             return true;
         }
-
         function isAtTopEdge() {
             return window.scrollY <= 0;
         }
-
         function isAtBottomEdge() {
             const doc = document.documentElement;
             return Math.ceil(window.scrollY + window.innerHeight) >= doc.scrollHeight;
         }
-
         function triggerEdgeBounce(source: 'wheel' | 'touch') {
             const now = Date.now();
             const cooldown = source === 'touch' ? 680 : 320;
             if (now - lastBounceAt < cooldown) return;
             if (bounceLocked) return;
-
             lastBounceAt = now;
             bounceLocked = true;
             document.body.classList.remove('edge-bounce-top');
@@ -2911,55 +2757,44 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 bounceLocked = false;
             }, 300);
         }
-
         window.addEventListener('wheel', (event) => {
             if (!canUseGlobalEdgeBounce(event.target)) return;
-
             if (event.deltaY < -8 && isAtTopEdge()) {
                 event.preventDefault();
                 triggerEdgeBounce('wheel');
             }
         }, { passive: false });
-
         window.addEventListener('touchstart', (event) => {
             touchStartY = event.touches[0]?.clientY ?? 0;
             touchStartScrollY = window.scrollY;
             touchBounceTriggered = false;
-
             if (!canUseGlobalEdgeBounce(event.target)) {
                 touchStartAtTop = false;
                 touchStartAtBottom = false;
                 return;
             }
-
             touchStartAtTop = isAtTopEdge();
             touchStartAtBottom = isAtBottomEdge();
         }, { passive: true });
-
         window.addEventListener('touchmove', (event) => {
             if (!canUseGlobalEdgeBounce(event.target)) return;
             if (touchBounceTriggered) return;
-
             const currentY = event.touches[0]?.clientY ?? 0;
             const deltaY = currentY - touchStartY;
             const deltaAbs = Math.abs(deltaY);
             const stillNearStart = Math.abs(window.scrollY - touchStartScrollY) <= 2;
-
             if (!stillNearStart || deltaAbs < 24 || deltaAbs > 120) {
                 return;
             }
-
             if (deltaY > 16 && touchStartAtTop) {
                 triggerEdgeBounce('touch');
                 touchBounceTriggered = true;
                 return;
             }
         }, { passive: false });
-
         window.addEventListener('touchend', () => {
             touchBounceTriggered = false;
         }, { passive: true });
-
         const homeSection = document.getElementById('home');
         const orientationWindow = window as unknown as Window & {
             DeviceOrientationEvent?: typeof DeviceOrientationEvent & {
@@ -2968,7 +2803,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
         };
         const isIOSDevice = /iPad|iPhone|iPod/i.test(navigator.userAgent);
         let orientationEnabled = false;
-
         function applyHeroTilt(gamma: number, beta: number) {
             if (!homeSection) return;
             const maxShift = isMobileViewport() ? 28 : 14;
@@ -2977,15 +2811,12 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
             homeSection.style.setProperty('--hero-shift-x', `${x.toFixed(2)}px`);
             homeSection.style.setProperty('--hero-shift-y', `${(-y).toFixed(2)}px`);
         }
-
         function startIOSHeroAutoDrift() {
             if (!homeSection) return;
             if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
             const startTime = performance.now();
             const duration = 5200;
             const amplitude = 20;
-
             const tick = (now: number) => {
                 const phase = ((now - startTime) % duration) / duration;
                 const x = Math.sin(phase * Math.PI * 2) * amplitude;
@@ -2993,10 +2824,8 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 homeSection.style.setProperty('--hero-shift-y', '0px');
                 window.requestAnimationFrame(tick);
             };
-
             window.requestAnimationFrame(tick);
         }
-
         function bindOrientationListener() {
             if (orientationEnabled) return;
             orientationEnabled = true;
@@ -3005,11 +2834,9 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                 applyHeroTilt(event.gamma, event.beta);
             }, { passive: true });
         }
-
         if (isIOSDevice && homeSection) {
             startIOSHeroAutoDrift();
         }
-
         if (!isIOSDevice && homeSection && orientationWindow.DeviceOrientationEvent) {
             if (typeof orientationWindow.DeviceOrientationEvent.requestPermission === 'function') {
                 const requestMotionPermission = () => {
@@ -3023,7 +2850,6 @@ function getCatalogImageAttrs(src: string, sizes: string, loading: 'lazy' | 'eag
                             // User may deny motion permission.
                         });
                 };
-
                 homeSection.addEventListener('click', requestMotionPermission, { once: true });
                 homeSection.addEventListener('touchstart', requestMotionPermission, { once: true, passive: true });
             } else {
